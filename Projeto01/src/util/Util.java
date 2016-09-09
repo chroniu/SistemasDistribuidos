@@ -3,6 +3,7 @@ package util;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.util.ArrayList;
  
 
 
@@ -39,5 +40,16 @@ public class Util{
 		e.printStackTrace();
 	}
 	return null;
+  }
+  
+  public static ArrayList<String> getLetterFromWord(String word){
+	  final ArrayList<String> letList = new  ArrayList<String>();
+	  char [] array = word.toCharArray();
+	  
+	  for(int i = 0; i < array.length; i++){
+		  letList.add(array[i]+"");
+	  }
+	  
+	  return letList;
   }
 }

@@ -1,8 +1,11 @@
 package skelly;
 
+import Messages.MessageType;
 import util.Util;
 
 public class GameServer implements Role {
+	private GameState gameState;
+	
 	
 	public void run() {
 		while(true){
@@ -18,12 +21,22 @@ public class GameServer implements Role {
 	}
 
 	public void receivedMsg(Message msg) {
-		SystemUsersList.processIdentityMessage(msg);
+		if(msg.type == MessageType.MSG_KNOW){
+			SystemUsersList.processIdentityMessage(msg);
+		}else if (msg.type == MessageType.MSG_THROW){
+			
+		}else if (msg.type == MessageType.MSG_THROW_FAIL){
+			
+		}else{
+			//mensagem não reconhecida
+		}
+		
+		
 	}
 
 	public void startExecution() {
-		// TODO Auto-generated method stub
-		
+		this.gameState = new GameState("Seleciona Palavra");
+	
 	}
 
 	public void newUserDiscovered(String identification, String typeSys) {
@@ -33,6 +46,6 @@ public class GameServer implements Role {
 
 	public void userRemoved(String identification, String typeSys) {
 		 Util.log("User Removed From Game Server");
-		 Util.log("id: "+identification+"  type: "+typeSys);	}
-
+		 Util.log("id: "+identification+"  type: "+typeSys);	
+	}
 }
