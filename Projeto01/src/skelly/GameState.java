@@ -28,7 +28,7 @@ public class GameState {
 	
 	private final String palavaCorreta;
 	
-	private final ArrayList<String> letrasErradas;//armazena as letras incorretas informadas
+	final ArrayList<String> letrasErradas;//armazena as letras incorretas informadas
 	private final ArrayList<String> letrasCorretas;//armazena as letras corretas faltantes
 	
 	private GamePlayerState currentPlayerIdentification;
@@ -122,5 +122,28 @@ public class GameState {
 			return false;
 		}
 	}
+	 
+	
+	/*
+	 * retorna a palavra atualizada para enviar para os jogadores
+	 */
+	public String wordState(){
+		char [] buf = this.palavaCorreta.toCharArray();
+		
+		for (int i = 0; i < buf.length; i++) {
+			if(buf[i] == ' '){
+				continue;
+			}else if(this.letrasCorretas.contains(buf[i]+"")){
+				continue;
+			}else{
+				buf[i] = '_';
+			}
+		}
+		
+		return new String(buf);
+	}
+	
+	
+	
 
 }
