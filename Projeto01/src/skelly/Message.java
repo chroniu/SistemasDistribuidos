@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import javax.crypto.*;
+
 import util.Configurations;
 import util.Util;
 import java.lang.System;;
@@ -16,13 +17,15 @@ class Message {
 	byte[] data;
 	final Cipher chiper;
 
-	public Message(String sender, String receiver, String type, byte[] data)
-			throws NoSuchAlgorithmException, NoSuchPaddingException {
+	public Message(String sender, String receiver, String type, byte[] data) throws NoSuchAlgorithmException, NoSuchPaddingException
+			 {
 		this.sender = sender;
 		this.receiver = receiver;
 		this.data = data;
-		this.chiper = Cipher.getInstance(Configurations.CryptoAlgorithm);
 		this.type = type;
+		this.chiper = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+		
+		
 	}
 
 	/*
