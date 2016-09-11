@@ -53,7 +53,7 @@ class MultiCastServer implements Runnable {
 	public void sendMessage(Message msg) {
 		try {
 			Util.log("Sending Message from: " + msg.sender + " to: "
-					+ msg.receiver);
+					+ msg.receiver+ " ttype: "+msg.type);
 			byte data[] = msg.toByteArray();
 			DatagramPacket dataPack = new DatagramPacket(data, 0, data.length,
 					multicastAddressGroup, port);

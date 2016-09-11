@@ -21,11 +21,16 @@ public class GameServer implements Role {
 	}
 
 	public void receivedMsg(Message msg) {
-		if(msg.type == MessageType.MSG_KNOW){
+		if(!msg.type.equals(MessageType.MSG_KNOW)){
+			 Util.log("Received Message from: "+msg.sender+" not secured checked yet");
+			 Util.log("Type Message from: "+msg.type);
+		}
+		
+		if(msg.type.equals(MessageType.MSG_KNOW)){
 			SystemUsersList.processIdentityMessage(msg);
-		}else if (msg.type == MessageType.MSG_THROW){
+		}else if (msg.type.equals(MessageType.MSG_THROW)){
 			
-		}else if (msg.type == MessageType.MSG_THROW_FAIL){
+		}else if (msg.type.equals(MessageType.MSG_THROW_FAIL)){
 			
 		}else{
 			//mensagem não reconhecida

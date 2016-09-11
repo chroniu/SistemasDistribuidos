@@ -1,5 +1,6 @@
 package skelly;
 
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -27,7 +28,7 @@ class Message {
 	/*
 	 * Encripta a mensagem localizada em @data
 	 */
-	public void encryptMessage(PublicKey key) {
+	public void encryptMessage(PrivateKey key) {
 		if (data == null) {
 			Util.log("MSG Data not defined");
 			return;
@@ -43,7 +44,7 @@ class Message {
 	/*
 	 * Decripta a mensagem localizada em @data
 	 */
-	public void decryptMessage(PrivateKey key) {
+	public void decryptMessage(PublicKey key) {
 		if (data == null) {
 			Util.log("MSG Data not definited");
 			return;

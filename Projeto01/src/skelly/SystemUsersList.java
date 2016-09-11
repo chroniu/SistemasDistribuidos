@@ -52,10 +52,13 @@ public class SystemUsersList implements Runnable {
 
 	// atualiza a lista de users
 	public static void processIdentityMessage(Message msg) {
+		Util.log("Processing KNow Mesage from: "+msg.sender );
 		if (!msg.type.equals(KnowMessageData.Identity)) {
 			return;
 		}
 		Node node = getUserNode(msg.sender);
+		Util.log("Node: "+node );
+
 		if(node == null){
 			KnowMessageData knowMessage = new KnowMessageData(msg.data);
 			if(knowMessage.valid){

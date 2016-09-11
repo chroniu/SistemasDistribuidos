@@ -9,6 +9,9 @@ public class MessageType {
 	//quando o usuário receber essa mensagem, indica que é a vez dele de mandar
 	public static final String MSG_TURN = "TURN";
 	
+	public static final String MSG_WANT_TO_PLAY = "WANT_TO_PLAY";
+	
+	
 	// indica a jogada do jogador
 	public static final String MSG_THROW = "THROW";
 	

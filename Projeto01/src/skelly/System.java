@@ -30,7 +30,7 @@ class System{
 	keyPair = Util.generateKeys();
 
 	 Util.log("Keys Generated");
-	 this.role =  (Role) (typeSys.equals(MessageType.MSG_USER) ? new Player()
+	 this.role =  (Role) (typeSys.equals(MessageType.MSG_USER) ? new Player(this.identification, this.keyPair.getPrivate())
 	            : new GameServer()); 
 	 
 	 this.server =  new MultiCastServer(ip, port, identification, role);
