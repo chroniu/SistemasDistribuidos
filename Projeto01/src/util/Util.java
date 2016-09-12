@@ -33,7 +33,7 @@ public class Util{
 
   public static  KeyPair generateKeys() {
 	try{
-		KeyPairGenerator keygen = KeyPairGenerator.getInstance(Configurations.CryptoAlgorithm);
+		KeyPairGenerator keygen = KeyPairGenerator.getInstance("RSA");
 	    keygen.initialize(1024);
 	    return keygen.generateKeyPair();
 	}catch(Exception e){

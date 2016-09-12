@@ -23,7 +23,7 @@ class Message {
 		this.receiver = receiver;
 		this.data = data;
 		this.type = type;
-		this.chiper = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+		this.chiper = Cipher.getInstance(Configurations.CryptoAlgorithm);
 		
 		
 	}
