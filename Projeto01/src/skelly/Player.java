@@ -1,14 +1,8 @@
 package skelly;
 
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-
-import javax.crypto.NoSuchPaddingException;
-
 import Messages.MessageType;
 import Messages.SimpleMessageDataChecker;
-import Messages.WantPlayData;
 import util.Util;
 
 public class Player implements Role{
@@ -53,6 +47,7 @@ public class Player implements Role{
 			Util.log("Checking Message Credentials");
 			Util.log("Cheking User Existence: "+SystemUsersList.getUserPublicKey(msg.sender));
 			
+
 			msg.decryptMessage(SystemUsersList.getUserPublicKey(msg.sender));
 			
 			if(SimpleMessageDataChecker.validMessage(msg.type, msg.data)){

@@ -53,8 +53,9 @@ class MultiCastServer implements Runnable {
 	public void sendMessage(Message msg) {
 		try {
 			Util.log("Sending Message from: " + msg.sender + " to: "
-					+ msg.receiver+ " ttype: "+msg.type);
+					+ msg.receiver+ " ttype: "+msg.type+" dataSize: "+msg.data.length);
 			byte data[] = msg.toByteArray();
+			Util.log("Message Total Lenght:"+data.length);
 			DatagramPacket dataPack = new DatagramPacket(data, 0, data.length,
 					multicastAddressGroup, port);
 			socket.send(dataPack);
@@ -73,17 +74,19 @@ class MultiCastServer implements Runnable {
 				socket.receive(data);
 
 				final byte [] datagramData = data.getData();
-
 				String sender = new String(Util.range(datagramData, 0, 16)).trim();
 				String receiver = new String(Util.range(datagramData, 16, 32)).trim();
 				String type = new String(Util.range(datagramData, 32, 32 + 16)).trim();
 				if(sender.equals(this.identification)){
 					//mensagem enviada pelo servidor. não precisa abrir
 				}else if (receiver.equals(identification)|| receiver.equals(MessageType.DEST_ALL)) {
-					Util.log("Received Message From " + sender);
+				//	Util.log("Recebendo Datagrama: "+datagramData.length);
+				//	Util.log("Received Message From " + sender);
 
 					Message msg = new Message(sender, receiver, type, (Util.range(
-							data.getData(), 16 * 3)));
+							data.getData(), 16 * 3, data.getLength())));
+	//				Util.log("MSG data: "+msg.data.length);
+					
 					this.receiveCallBack.receivedMsg(msg);
 
 				} else {

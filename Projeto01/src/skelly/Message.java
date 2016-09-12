@@ -32,6 +32,7 @@ class Message {
 	 * Encripta a mensagem localizada em @data
 	 */
 	public void encryptMessage(PrivateKey key) {
+		Util.log("Encriptando mensagem. DataSize: "+data.length);
 		if (data == null) {
 			Util.log("MSG Data not defined");
 			return;
@@ -39,6 +40,8 @@ class Message {
 		try {
 			this.chiper.init(Cipher.ENCRYPT_MODE, key);
 			data = this.chiper.doFinal(data);
+
+			Util.log("Final DataSize: "+data.length);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -48,6 +51,8 @@ class Message {
 	 * Decripta a mensagem localizada em @data
 	 */
 	public void decryptMessage(PublicKey key) {
+		Util.log("Descriptando mensagem: data.size "+data.length);
+		
 		if (data == null) {
 			Util.log("MSG Data not definited");
 			return;
@@ -55,6 +60,8 @@ class Message {
 		try {
 			this.chiper.init(Cipher.DECRYPT_MODE, key);
 			data = this.chiper.doFinal(data);
+
+			Util.log("data.size final"+data.length);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

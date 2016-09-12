@@ -23,13 +23,7 @@ public class SimpleMessageDataChecker {
 			msg = MessageContent.I_WANT_TO_PLAY;
 		}
 		byte [] data = msg.getBytes();
-		if(data.length < 100){
-			byte [] buff  = new byte[117];
-			for(int i = 0;i<data.length;i++){
-				buff[i] = data[i];
-			}
-			data = buff;
-		}
+		 
 		return data;
 	}
 
