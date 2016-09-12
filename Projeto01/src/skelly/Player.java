@@ -53,8 +53,8 @@ public class Player implements Role{
 			if(SimpleMessageDataChecker.validMessage(msg.type, msg.data)){
 				Util.log("Message is Valid");
 		  	 try {
-					Message msg_reply = new Message(this.identification, identification,
-							 MessageType.MSG_I_WANT_TO_PLAY_CHK_STRING, 
+					Message msg_reply = new Message(this.identification, msg.sender,
+							 MessageType.MSG_I_WANT_TO_PLAY, 
 							 SimpleMessageDataChecker.getDataForMessage(MessageType.MSG_I_WANT_TO_PLAY));
 					msg_reply.encryptMessage(this.privateKey);
 					MultiCastServer.getInstance().sendMessage(msg_reply);

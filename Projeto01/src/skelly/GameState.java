@@ -143,7 +143,9 @@ public class GameState {
 		return new String(buf);
 	}
 	
-	
+	public int getNumPlayers(){
+		return this.playerIdentifications.size();
+	}
 	
 
 }
