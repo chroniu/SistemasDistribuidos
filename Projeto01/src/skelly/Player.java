@@ -9,6 +9,14 @@ public class Player implements Role{
 	private final String identification;
 	private final PrivateKey privateKey;
 	
+	private final int STATE_WAITING_GAME_START = 1;
+	private final int STATE_WAITING_TURN = 2;
+	private final int STATE_JOGADA = 3;
+	private final int STATE_WAITING_REPLY_FROM_SERVER = 4;
+	private final int STATE_GAME_ENDED = 5;
+	private int state;
+	
+	
 	public Player(String identification, PrivateKey privateKey){
 		this.identification = identification;
 		this.privateKey = privateKey;
@@ -17,7 +25,26 @@ public class Player implements Role{
 	public void run() {
 		while(true){
 			try {
-			
+				switch (state) {
+				case STATE_WAITING_GAME_START:
+					
+					break;
+				case STATE_WAITING_TURN:
+					
+					break;
+				case STATE_JOGADA:
+					
+					break;
+				case STATE_WAITING_REPLY_FROM_SERVER:
+					
+					break;
+				case STATE_GAME_ENDED:
+					
+					break;
+
+				default:
+					break;
+				}
 				Thread.sleep(100);
 			
 			} catch (InterruptedException e) {
@@ -40,10 +67,15 @@ public class Player implements Role{
 		if(msg.type.equals(MessageType.MSG_KNOW)){
 			SystemUsersList.processIdentityMessage(msg);
 		}else if (msg.type.equals(MessageType.MSG_TURN)){
+			if(state != STATE_WAITING_TURN)  return;
 			
 		}else if (msg.type.equals(MessageType.MSG_THROW_REPLY)){
+			if(state != STATE_WAITING_REPLY_FROM_SERVER)  return;
 			
 		}else if (msg.type.equals(MessageType.MSG_DO_WANT_PLAY)){
+			if(state != STATE_WAITING_GAME_START) return;
+			
+				
 			Util.log("Checking Message Credentials");
 			Util.log("Cheking User Existence: "+SystemUsersList.getUserPublicKey(msg.sender));
 			
@@ -73,8 +105,8 @@ public class Player implements Role{
 		}
 	}
 
-	public void startExecution() {
-		// TODO Auto-generated method stub
+	public void startExecution() { 
+		state = STATE_WAITING_GAME_START;
 		
 	}
 
