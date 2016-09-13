@@ -55,7 +55,10 @@ public class Player implements Role{
 					this.sleepTime = 500;
 					break;
 				case STATE_GAME_ENDED:
-					this.sleepTime = 5000;
+					Thread.sleep(10000);
+					//this.state = STATE_WAITING_GAME_START;
+					startExecution();
+					this.sleepTime = 1;
 					break;
 
 				default:
@@ -166,7 +169,19 @@ public class Player implements Role{
 			
 
 		}else if (msg.type.equals(MessageType.MSG_GAME_ENDED)){
-		
+			if(this.state == STATE_WAITING_GAME_START) return;
+			this.state  = STATE_GAME_ENDED;
+			
+			msg.decryptMessage(SystemUsersList.getUserPublicKey(msg.sender));
+			GameMessageData gmd = new GameMessageData(msg.data);
+			if(gmd.state.valid){
+				this.state = STATE_GAME_ENDED;
+				Util.log(gmd.serverMessage+"\n", Configurations.OUT_INTERFACE);
+				Util.log(gmd.state.toString()+"\n", Configurations.OUT_INTERFACE);
+			}else{
+				Util.log("Message is not valid - Wrong keys?", Configurations.OUT_LOG);
+			}
+
 		}else{
 			Util.log("Mensagem não reconhecida - TIPO>: "+msg.type, Configurations.OUT_INTERFACE);
 		}

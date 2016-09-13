@@ -119,6 +119,8 @@ public class GameState {
 			}else{
 				this.currentPlayerIdentification.erros += 1; 	
 				this.letrasErradas.add(guess);
+				
+				verificarErrosJogadorAtual();
 				return false;
 
 			}
@@ -139,11 +141,20 @@ public class GameState {
 		}else{
 			this.currentPlayerIdentification.erros  += 1;
 			this.letrasErradas.add(guess.toLowerCase());
+			verificarErrosJogadorAtual();
 			return false;
 		}
 	}
 	 
 	
+	private void verificarErrosJogadorAtual() {
+		if(this.currentPlayerIdentification.erros >= Configurations.MAX_ERROS){
+			removeUserFromGame(this.currentPlayerIdentification.identification);
+		}
+		
+	}
+
+
 	/*
 	 * retorna a palavra atualizada para enviar para os jogadores
 	 */
@@ -177,6 +188,11 @@ public class GameState {
 		
 		GameStateDecEncoder decoder = new GameStateDecEncoder(this.currentPlayerIdentification.erros, wordState(), letrasErradas.toString(), pontuacoes);
 		return decoder;
+	}
+
+
+	public boolean userIsInGame(String identification) {
+		return userIsAdded(identification);
 	}
 	
 

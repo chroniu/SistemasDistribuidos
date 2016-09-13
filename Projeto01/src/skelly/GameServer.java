@@ -57,6 +57,7 @@ public class GameServer implements Role {
 				break;
 			case STATE_GAME_ENDED:
 				stateGameEnded();
+				startExecution();
 				break;
 			default:
 				break;
@@ -72,8 +73,19 @@ public class GameServer implements Role {
 	
 	
 
-	private void stateGameEnded() {
-		// TODO Auto-generated method stub
+	private void stateGameEnded() { 
+		try{
+			Message msg = new Message(this.identification, MessageType.DEST_ALL, MessageType.MSG_GAME_ENDED, 
+					new GameMessageData("FIM DE JOGO", this.gameState.getDecoder()).toByteArray());
+			msg.encryptMessage(privateKey);
+			MultiCastServer.getInstance().sendMessage(msg);
+			Util.log("Sending Reply Message to: "+msg.receiver+ " Game_ENDED", Configurations.OUT_INTERFACE);
+			Thread.sleep(Configurations.TIMER_GAME_ENDED);
+			this.sleepTime = 1;
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	
 		
 	}
 
@@ -165,19 +177,37 @@ public class GameServer implements Role {
 					Util.log("Message is Valid", Configurations.OUT_INTERFACE);
 					boolean acertou = gameState.updateState(messageData.aposta, msg.sender);
 					Util.log("Acertou? "+acertou, Configurations.OUT_INTERFACE);
-					Message replyMsg;
-					try {
-						replyMsg = new Message(
-								this.identification,
-								msg.sender,
-								MessageType.MSG_THROW_REPLY,
-								new GameMessageData((acertou? "Acertou": "Errou"), this.gameState.getDecoder()).toByteArray());
+					if(this.gameState.userIsInGame(this.gameState.currentPlayerIdentification())){
 						
-						replyMsg.encryptMessage(privateKey);
-						MultiCastServer.getInstance().sendMessage(replyMsg);
-						
-					} catch (Exception e) {
-						e.printStackTrace();
+						Message replyMsg;
+						try {
+							replyMsg = new Message(
+									this.identification,
+									msg.sender,
+									MessageType.MSG_THROW_REPLY,
+									new GameMessageData((acertou? "Acertou": "Errou"), this.gameState.getDecoder()).toByteArray());
+							
+							replyMsg.encryptMessage(privateKey);
+							MultiCastServer.getInstance().sendMessage(replyMsg);
+							
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}else{
+						Message replyMsg;
+						try {
+							replyMsg = new Message(
+									this.identification,
+									msg.sender,
+									MessageType.MSG_GAME_ENDED,
+									new GameMessageData("Errou demais: Perdeu", this.gameState.getDecoder()).toByteArray());
+							
+							replyMsg.encryptMessage(privateKey);
+							MultiCastServer.getInstance().sendMessage(replyMsg);
+							
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 					state = STATE_NEXT_PLAYER;
 					checkEndOfGame();	

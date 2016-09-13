@@ -47,7 +47,7 @@ public class GameStateDecEncoder {
 		this.erros_jogador = Integer.parseInt(erros_jogador);
 		this.palavraAtual = palavraAtual;
 		this.letrasErradas = letrasErradas;
-		this.pontuacao = pontuacao.split("$");
+		this.pontuacao = pontuacao.split("x");
 	
 		this.valid = (this.palavraAtual!=null) && (this.pontuacao!=null);
 
@@ -59,7 +59,7 @@ public class GameStateDecEncoder {
 		stb += "Letras Erradas@"+(this.letrasErradas==null?"":this.letrasErradas)+"@";
 		stb += "Pontuacao@";
 		for(int i=0;i<pontuacao.length;i++){
-			stb+=pontuacao[i]+"$";
+			stb+=pontuacao[i]+"x";
 		}
 		stb +="@Palavra_Atual@"+palavraAtual;
 		 
@@ -68,9 +68,9 @@ public class GameStateDecEncoder {
 
 	@Override
 	public String toString() {
-		return "GameStateDecEncoder [erros_jogador=" + erros_jogador
-				+ ", letrasErradas=" + letrasErradas + ", pontuacao="
-				+ Arrays.toString(pontuacao) + ", palavraAtual=" + palavraAtual
+		return "GameStateDecEncoder [Seus Erros = " + erros_jogador
+				+ "\nletrasErradas=" + letrasErradas + "\npontuacao="
+				+ Arrays.toString(pontuacao) + "\nPalavra Atual =" + palavraAtual
 				+ "]";
 	}
 	
