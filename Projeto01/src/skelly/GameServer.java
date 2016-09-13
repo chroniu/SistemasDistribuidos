@@ -2,9 +2,8 @@ package skelly;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-
+import java.lang.System;
 import javax.crypto.NoSuchPaddingException;
-
 import Messages.GameMessageData;
 import Messages.MessageType;
 import Messages.SimpleMessageDataChecker;
@@ -30,11 +29,13 @@ public class GameServer implements Role {
 	private final int STATE_WAITING_JOGADA = 4;
 	private final int STATE_GAME_ENDED = 5;
 	private long sleepTime;
+	private long timerVeriify;
 	
 	public GameServer(String identification, PrivateKey privateKey) {
 		this.identification = identification;
 		this.privateKey = privateKey;
 		this.sleepTime = 0;
+		this.timerVeriify = -1;
 	}
 
 	public void run() {
@@ -77,8 +78,20 @@ public class GameServer implements Role {
 	}
 
 	private void stateWaitingJogada() {
-		this.sleepTime = 1000;  ///TODO colocar um timer pra se o jogador não mandar, perder a vez, mandando uma mensagen ThowReply
-		
+		if((System.currentTimeMillis() - this.timerVeriify ) > Configurations.MAX_TIME_TO_PLAY){
+			try{
+				Message msg = new Message(this.identification, this.gameState.currentPlayerIdentification(), MessageType.MSG_THROW_REPLY, 
+						new GameMessageData("PERDEU A VEZ", this.gameState.getDecoder()).toByteArray());
+				msg.encryptMessage(privateKey);
+				MultiCastServer.getInstance().sendMessage(msg);
+				Util.log("Sending Reply Message to: "+msg.receiver+ " Perdeu a vez", Configurations.OUT_INTERFACE);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+			
+			this.state = STATE_NEXT_PLAYER;
+			this.sleepTime = 1;
+		}else this.sleepTime = 1000;  ///TODO colocar um timer pra se o jogador não mandar, perder a vez, mandando uma mensagen ThowReply
 	}
 
 	private void stateGameNextPlayer() throws NoSuchAlgorithmException, NoSuchPaddingException {
@@ -90,6 +103,7 @@ public class GameServer implements Role {
 		MultiCastServer.getInstance().sendMessage(msg);
 		Util.log("Sending Turn Message to: "+msg.receiver, Configurations.OUT_INTERFACE);
 		this.sleepTime = 1000;
+		this.timerVeriify = System.currentTimeMillis();
 		state = STATE_WAITING_JOGADA;
 	}
 
@@ -162,7 +176,6 @@ public class GameServer implements Role {
 						replyMsg.encryptMessage(privateKey);
 						MultiCastServer.getInstance().sendMessage(replyMsg);
 						
-						
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -210,21 +223,25 @@ public class GameServer implements Role {
 		Util.log("New User DIscoverd By Game Server", Configurations.OUT_INTERFACE);
 		Util.log("id: " + identification + "  type: " + typeSys, Configurations.OUT_INTERFACE);
 
-		try {
-			Message msg = new Message(this.identification, identification,
-					MessageType.MSG_DO_WANT_PLAY,
-					SimpleMessageDataChecker
-							.getDataForMessage(MessageType.MSG_DO_WANT_PLAY));
-			msg.encryptMessage(privateKey);
-			MultiCastServer.getInstance().sendMessage(msg);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			Message msg = new Message(this.identification, identification,
+//					MessageType.MSG_DO_WANT_PLAY,
+//					SimpleMessageDataChecker
+//							.getDataForMessage(MessageType.MSG_DO_WANT_PLAY));
+//			msg.encryptMessage(privateKey);
+//			MultiCastServer.getInstance().sendMessage(msg);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 
 	}
 
 	public void userRemoved(String identification, String typeSys) {
 		Util.log("User Removed From Game Server", Configurations.OUT_INTERFACE);
 		Util.log("id: " + identification + "  type: " + typeSys, Configurations.OUT_INTERFACE);
+		this.gameState.removeUserFromGame(identification);
+		if(this.gameState.gameEnded()){
+			this.state = STATE_GAME_ENDED;
+		}
 	}
 }

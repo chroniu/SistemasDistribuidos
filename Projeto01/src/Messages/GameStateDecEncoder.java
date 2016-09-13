@@ -41,7 +41,9 @@ public class GameStateDecEncoder {
 				palavraAtual = strs[++i];
 			}
 		}
-		
+		if(erros_jogador==null){
+			System.out.print("x");
+		}
 		this.erros_jogador = Integer.parseInt(erros_jogador);
 		this.palavraAtual = palavraAtual;
 		this.letrasErradas = letrasErradas;

@@ -43,7 +43,7 @@ public class Util{
   public static  KeyPair generateKeys() {
 	try{
 		KeyPairGenerator keygen = KeyPairGenerator.getInstance("RSA");
-	    keygen.initialize(1024);
+	    keygen.initialize(2048);
 	    return keygen.generateKeyPair();
 	}catch(Exception e){
 		e.printStackTrace();
@@ -56,7 +56,8 @@ public class Util{
 	  char [] array = word.toCharArray();
 	  
 	  for(int i = 0; i < array.length; i++){
-		  letList.add(array[i]+"");
+		  if(array[i] != ' ')
+			  letList.add(array[i]+"");
 	  }
 	  
 	  return letList;

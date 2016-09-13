@@ -52,11 +52,9 @@ public class Player implements Role{
 					this.sleepTime = 500;
 					break;
 				case STATE_WAITING_REPLY_FROM_SERVER:
-					
 					this.sleepTime = 500;
 					break;
 				case STATE_GAME_ENDED:
-					
 					this.sleepTime = 5000;
 					break;
 
@@ -127,8 +125,7 @@ public class Player implements Role{
 			}
 			
 		}else if (msg.type.equals(MessageType.MSG_THROW_REPLY)){
-			if(state != STATE_WAITING_REPLY_FROM_SERVER)  return;
-			//TODO verificar sender
+			if(!(state ==  STATE_WAITING_REPLY_FROM_SERVER || state== STATE_JOGADA ))  return;
 			
 			msg.decryptMessage(SystemUsersList.getUserPublicKey(msg.sender));
 			GameMessageData gmd = new GameMessageData(msg.data);
@@ -188,6 +185,6 @@ public class Player implements Role{
 
 	public void userRemoved(String identification, String typeSys) {
 		 Util.log("User Removed", Configurations.OUT_LOG);
-		 Util.log("id: "+identification+"  type: "+typeSys, Configurations.OUT_LOG);	}
-
+		 Util.log("id: "+identification+"  type: "+typeSys, Configurations.OUT_LOG);	
+	}
 }

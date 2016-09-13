@@ -117,12 +117,27 @@ public class SystemUsersList implements Runnable {
 			//TODO Verificar a cada tempo T, se um usuário parou de existir
 			try {
 				Thread.sleep(Configurations.KNOW_MSG_SLEEPER);
+				checkUserTimeOut();
+				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
 		}
+	}
+
+	private void checkUserTimeOut() {
+		ArrayList<Node> toRemove = new ArrayList<Node>(); 
+		long timeNow = System.currentTimeMillis();
+		for (Node node: nodeList) {
+			if( (timeNow - node.timeFromLastMsg)>Configurations.MAX_TIME_TO_REMOVE_FROM ){
+				toRemove.add(node);
+				role.userRemoved(node.identification, node.typeSys);
+			}
+		}
+		nodeList.remove(toRemove);
+		
 	}
 
 }

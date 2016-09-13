@@ -40,9 +40,10 @@ public class GameState {
 	public GameState(String palavaCorreta) {
 		this.palavaCorreta = palavaCorreta;
 		this.letrasErradas = new ArrayList<String>();
-		this.letrasCorretas = Util.getLetterFromWord(this.palavaCorreta);
+		this.letrasCorretas = Util.getLetterFromWord(this.palavaCorreta.toLowerCase());
 		this.playerIdentifications = new ArrayList<GamePlayerState>();
 		this.currentPlayerIdentification = null;
+		
 	}
 	
 	
@@ -88,7 +89,7 @@ public class GameState {
 	}
 	
 	public boolean gameEnded(){
-		return this.letrasCorretas.isEmpty();
+		return (this.letrasCorretas.isEmpty() || this.playerIdentifications.isEmpty());
 	}
 	
 	public String currentPlayerIdentification(){
@@ -99,7 +100,8 @@ public class GameState {
 	 * Atualiza o estado do jogo
 	 * retorna true se a guess foi correta
 	 */
-	public boolean updateState(String guess, String playerIdentity){
+	public boolean updateState(String guess, final String playerIdentity){
+		guess = guess.toLowerCase();
 		if(!this.currentPlayerIdentification.identification.equals(playerIdentity)){
 			Util.log("GameState: "+playerIdentity+ " tryed to play, but it's "+ this.currentPlayerIdentification+" turn", Configurations.OUT_LOG);
 			return false;
@@ -109,9 +111,9 @@ public class GameState {
 		// guess de word
 		if(guess.length()>1){
 			Util.log("Guess Word: "+guess, Configurations.OUT_INTERFACE);
-			if(this.palavaCorreta.equals(guess)){
+			if(this.palavaCorreta.toUpperCase().equals(guess.toUpperCase())){
 				this.currentPlayerIdentification.acertos += this.letrasCorretas.size();
-				this.letrasCorretas.remove(this.letrasCorretas);
+				this.letrasCorretas.clear();
 				return true;
 
 			}else{
@@ -126,7 +128,7 @@ public class GameState {
 		int acertos = 0;
 
 		Util.log("Letras corretas: "+this.letrasCorretas, Configurations.OUT_INTERFACE);
-		Util.log("LetrasCorretas Contains guess? "+this.letrasCorretas.contains(guess), Configurations.OUT_INTERFACE);
+		Util.log("LetrasCorretas Contains guess? "+this.letrasCorretas.contains(guess.toLowerCase()), Configurations.OUT_INTERFACE);
 		while(this.letrasCorretas.contains(guess)){
 			acertos++;
 			this.letrasCorretas.remove(guess);
@@ -136,7 +138,7 @@ public class GameState {
 			return true;
 		}else{
 			this.currentPlayerIdentification.erros  += 1;
-			this.letrasErradas.add(guess);
+			this.letrasErradas.add(guess.toLowerCase());
 			return false;
 		}
 	}
@@ -151,7 +153,7 @@ public class GameState {
 		for (int i = 0; i < buf.length; i++) {
 			if(buf[i] == ' '){
 				continue;
-			}else if(!this.letrasCorretas.contains(buf[i]+"")){
+			}else if(!this.letrasCorretas.contains((buf[i]+"").toLowerCase())){
 				continue;
 			}else{
 				buf[i] = '_';
