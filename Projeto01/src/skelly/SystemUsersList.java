@@ -8,6 +8,9 @@ import Messages.KnowMessageData;
 import Messages.MessageType;
 import java.lang.System;
 
+/*
+ * Classe auxiliar
+ */
 class Node {
 	final String identification;
 	final String typeSys;

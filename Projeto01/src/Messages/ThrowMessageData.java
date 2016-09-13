@@ -1,5 +1,10 @@
 package Messages;
 
+/**
+ * Classe que representa os dados de uma mensagem de aposta do Player
+ * @author lucas
+ *
+ */
 public class ThrowMessageData {
 	public final String aposta;
 	public final boolean valid;

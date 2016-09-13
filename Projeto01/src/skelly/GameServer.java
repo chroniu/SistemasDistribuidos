@@ -11,6 +11,11 @@ import Messages.SimpleMessageDataChecker;
 import Messages.ThrowMessageData;
 import util.Util;
 
+/**
+ * Classe que implementa o papel de gerador de palavras
+ * @author lucas
+ *
+ */
 public class GameServer implements Role {
 	private GameState gameState;
 	private final String identification;

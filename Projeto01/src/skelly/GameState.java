@@ -19,7 +19,8 @@ class GamePlayerState{
 	}
 }
 /**
- * Classe que representa um estado de jogo
+ * Classe que representa um estado de jogo.
+ * Possui métodos para cuidar do estado do jogo
  *
  * @author lucas
  *

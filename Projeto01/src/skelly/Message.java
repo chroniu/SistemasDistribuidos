@@ -1,15 +1,18 @@
 package skelly;
 
-import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import javax.crypto.*;
-
 import util.Configurations;
 import util.Util;
 import java.lang.System;;
 
+/*
+ * Classe que representa uma mensagem
+ * Possui campos para indicar quem enviou, pra quem é, qual o tipo e os dados da mensagem
+ * Possui métodos para criptografar e descriptografar mensagens.
+ */
 class Message {
 	final String sender;
 	final String receiver;

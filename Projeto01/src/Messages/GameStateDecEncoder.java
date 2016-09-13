@@ -1,5 +1,10 @@
 package Messages;
 
+/**
+ * Classe para o GameServer mandar o estado do jogo e mensagens para os Players
+ * @author lucas
+ *
+ */
 public class GameStateDecEncoder {
 	public final int erros_jogador;
 	public final String palavraAtual;

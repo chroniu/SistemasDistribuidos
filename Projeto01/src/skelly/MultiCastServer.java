@@ -14,6 +14,7 @@ import util.Util;
 /**
  * Classe atua como um servidor Multicast. Possui funções de envio e recebimento
  * de mensagens.
+ * Automaticamente repassa as mensagens chegadas à um "ouvinte", que será um PLayer ou GameServer
  * 
  * @addres -> Endereço do Multicast
  * @port -> Porta

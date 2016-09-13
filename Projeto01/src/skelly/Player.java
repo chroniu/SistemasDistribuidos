@@ -5,6 +5,11 @@ import Messages.MessageType;
 import Messages.SimpleMessageDataChecker;
 import util.Util;
 
+/**
+ * Implementa o papel de um Jogador
+ * @author lucas
+ *
+ */
 public class Player implements Role{
 	private final String identification;
 	private final PrivateKey privateKey;
