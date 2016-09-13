@@ -1,6 +1,8 @@
 package skelly;
 
 import java.util.ArrayList;
+
+import Messages.GameStateDecEncoder;
 import util.Util;
 
 class GamePlayerState{
@@ -43,12 +45,22 @@ public class GameState {
 	
 	
 	public void addUserToGame(String identification){
+		if(userIsAdded(identification)) return;
+		
 		Util.log("GameState: USER "+identification+" ADDED");
 		
 		GamePlayerState playerState = new GamePlayerState(identification);
 		this.playerIdentifications.add(playerState);
 	}
 	
+	private boolean userIsAdded(String ident){
+		for (GamePlayerState gs : playerIdentifications) {
+			if(gs.identification.equals(ident))
+				return true;
+		}
+		
+		return false;
+	}
 	public void removeUserFromGame(String identification){
 		
 		for (GamePlayerState state : playerIdentifications) {
@@ -133,7 +145,7 @@ public class GameState {
 		for (int i = 0; i < buf.length; i++) {
 			if(buf[i] == ' '){
 				continue;
-			}else if(this.letrasCorretas.contains(buf[i]+"")){
+			}else if(!this.letrasCorretas.contains(buf[i]+"")){
 				continue;
 			}else{
 				buf[i] = '_';
@@ -145,6 +157,18 @@ public class GameState {
 	
 	public int getNumPlayers(){
 		return this.playerIdentifications.size();
+	}
+
+
+	public GameStateDecEncoder getDecoder() {
+		 String [] pontuacoes = new String[this.playerIdentifications.size()];
+		 int i=0;
+		for (GamePlayerState gamePlayerState : this.playerIdentifications) {
+			pontuacoes[i++] = gamePlayerState.identification+": "+gamePlayerState.acertos;
+		}
+		
+		GameStateDecEncoder decoder = new GameStateDecEncoder(this.currentPlayerIdentification.erros, wordState(), letrasErradas.toString(), pontuacoes);
+		return decoder;
 	}
 	
 
