@@ -55,12 +55,12 @@ public class SystemUsersList implements Runnable {
 
 	// atualiza a lista de users
 	public static void processIdentityMessage(Message msg) {
-		Util.log("Processing KNow Mesage from: "+msg.sender );
+		Util.log("Processing KNow Mesage from: "+msg.sender , Configurations.OUT_LOG);
 		if (!msg.type.equals(KnowMessageData.Identity)) {
 			return;
 		}
 		Node node = getUserNode(msg.sender);
-		Util.log("Node: "+node );
+		Util.log("Node: "+node , Configurations.OUT_LOG);
 
 		if(node == null){
 			KnowMessageData knowMessage = new KnowMessageData(msg.data);
@@ -70,7 +70,7 @@ public class SystemUsersList implements Runnable {
 				nodeList.add(node);
 				role.newUserDiscovered(node.identification, node.typeSys);
 			}else{
-				Util.log("Mensagem "+KnowMessageData.Identity+" Inválida");
+				Util.log("Mensagem "+KnowMessageData.Identity+" Inválida", Configurations.OUT_LOG);
 			}
 		}else{
 			node.timeFromLastMsg = System.currentTimeMillis();

@@ -3,6 +3,7 @@ package skelly;
 import java.util.ArrayList;
 
 import Messages.GameStateDecEncoder;
+import util.Configurations;
 import util.Util;
 
 class GamePlayerState{
@@ -48,7 +49,7 @@ public class GameState {
 	public void addUserToGame(String identification){
 		if(userIsAdded(identification)) return;
 		
-		Util.log("GameState: USER "+identification+" ADDED");
+		Util.log("GameState: USER "+identification+" ADDED", Configurations.OUT_LOG);
 		
 		GamePlayerState playerState = new GamePlayerState(identification);
 		this.playerIdentifications.add(playerState);
@@ -66,13 +67,13 @@ public class GameState {
 		
 		for (GamePlayerState state : playerIdentifications) {
 			if(state.identification.equals(identification)){
-				Util.log("GameState: USER "+identification+" REMOVED");
+				Util.log("GameState: USER "+identification+" REMOVED", Configurations.OUT_LOG);
 
 				this.playerIdentifications.remove(state);
 				return;
 			}
 		}
-		Util.log("GameState: USER "+identification+" NOT REMOVED - NOT FOUND");
+		Util.log("GameState: USER "+identification+" NOT REMOVED - NOT FOUND", Configurations.OUT_LOG);
 
 	}
 	
@@ -81,13 +82,13 @@ public class GameState {
 		this.playerIdentifications.remove(playerState);
 		this.playerIdentifications.add(playerState);
 	
-		Util.log("GameState: NEXT PLAYER "+playerState.identification+" SELECTED");
+		Util.log("GameState: NEXT PLAYER "+playerState.identification+" SELECTED", Configurations.OUT_LOG);
 		this.currentPlayerIdentification = playerState;
 		return playerState.identification;
 	}
 	
 	public boolean gameEnded(){
-		return ! this.letrasCorretas.isEmpty();
+		return this.letrasCorretas.isEmpty();
 	}
 	
 	public String currentPlayerIdentification(){
@@ -99,13 +100,15 @@ public class GameState {
 	 * retorna true se a guess foi correta
 	 */
 	public boolean updateState(String guess, String playerIdentity){
-		if(!currentPlayerIdentification.equals(playerIdentity)){
-			Util.log("GameState: "+playerIdentity+ " tryed to play, but it's "+ this.currentPlayerIdentification+" turn");
+		if(!this.currentPlayerIdentification.identification.equals(playerIdentity)){
+			Util.log("GameState: "+playerIdentity+ " tryed to play, but it's "+ this.currentPlayerIdentification+" turn", Configurations.OUT_LOG);
 			return false;
 		}
+		Util.log("Guess: "+guess, Configurations.OUT_INTERFACE);
 		
 		// guess de word
 		if(guess.length()>1){
+			Util.log("Guess Word: "+guess, Configurations.OUT_INTERFACE);
 			if(this.palavaCorreta.equals(guess)){
 				this.currentPlayerIdentification.acertos += this.letrasCorretas.size();
 				this.letrasCorretas.remove(this.letrasCorretas);
@@ -121,7 +124,9 @@ public class GameState {
 		
 		
 		int acertos = 0;
-		
+
+		Util.log("Letras corretas: "+this.letrasCorretas, Configurations.OUT_INTERFACE);
+		Util.log("LetrasCorretas Contains guess? "+this.letrasCorretas.contains(guess), Configurations.OUT_INTERFACE);
 		while(this.letrasCorretas.contains(guess)){
 			acertos++;
 			this.letrasCorretas.remove(guess);

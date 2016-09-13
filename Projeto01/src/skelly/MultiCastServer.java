@@ -9,6 +9,7 @@ import java.net.ServerSocket;
 
 import Messages.MessageType;
 
+import util.Configurations;
 import util.Util;
 
 /**
@@ -54,9 +55,9 @@ class MultiCastServer implements Runnable {
 	public void sendMessage(Message msg) {
 		try {
 			Util.log("Sending Message from: " + msg.sender + " to: "
-					+ msg.receiver+ " ttype: "+msg.type+" dataSize: "+msg.data.length);
+					+ msg.receiver+ " ttype: "+msg.type+" dataSize: "+msg.data.length, Configurations.OUT_LOG);
 			byte data[] = msg.toByteArray();
-			Util.log("Message Total Lenght:"+data.length);
+			Util.log("Message Total Lenght:"+data.length, Configurations.OUT_LOG);
 			DatagramPacket dataPack = new DatagramPacket(data, 0, data.length,
 					multicastAddressGroup, port);
 			socket.send(dataPack);
@@ -92,7 +93,7 @@ class MultiCastServer implements Runnable {
 
 				} else {
 					Util.log("Message to: " + receiver + " from: " + sender
-							+ " ignored");
+							+ " ignored", Configurations.OUT_LOG);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

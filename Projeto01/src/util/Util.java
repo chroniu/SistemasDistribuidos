@@ -26,9 +26,18 @@ public class Util{
   }
 
 
-  public static void log(String msg){
-	  System.out.println("SERVER: " + msg);
+  public static void log(String msg, int type){
 	  
+	  //imprime tudo
+	  if(Configurations.OUTPUT>=3){
+
+		  System.out.println("SERVER: " + msg);
+		    
+	  }else{
+		  if(type == Configurations.OUTPUT){
+			  System.out.println("SERVER: " + msg);
+		  }
+	  }
   }
 
   public static  KeyPair generateKeys() {
@@ -52,4 +61,5 @@ public class Util{
 	  
 	  return letList;
   }
+ 
 }

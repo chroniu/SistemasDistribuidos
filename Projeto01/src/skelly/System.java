@@ -1,4 +1,5 @@
 package skelly;
+import util.Configurations;
 import util.Util;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ class System{
  final MultiCastServer server;
  
  public System(String identification, String ip, int port, String typeSys) throws IOException {
-	Util.log("Initialising "+identification+  " Type: "+typeSys);
+	Util.log("Initialising "+identification+  " Type: "+typeSys, Configurations.OUT_LOG);
 	
 	this.identification = identification;
 	this.ip = ip;
@@ -29,9 +30,9 @@ class System{
 	this.typeSys = typeSys;
 	keyPair = Util.generateKeys();
 
-	 Util.log("Keys Generated");
-	 Util.log("Public  Key:" +keyPair.getPublic());
-	 Util.log("Private Key:" +keyPair.getPrivate());
+	 Util.log("Keys Generated", Configurations.OUT_LOG);
+	 Util.log("Public  Key:" +keyPair.getPublic(), Configurations.OUT_LOG);
+	 Util.log("Private Key:" +keyPair.getPrivate(), Configurations.OUT_LOG);
 	 
 	 
 	 //responsável pelo papel de GameServer ou Player
@@ -43,15 +44,15 @@ class System{
 
 	 // inicializa o servidor MultiCast
 	 (new Thread(this.server)).start();
-	 Util.log("Multicast Server initialized");
+	 Util.log("Multicast Server initialized", Configurations.OUT_LOG);
 	 
 	 //(new Thread(this.server)).start();
  	//inicializa a Thread responsável por criar e manter a lista de usuarios do sistema
 	 (new Thread(new SystemUsersList(this.identification, this.typeSys, this.keyPair.getPublic(), this.role))).start();
 
-	 Util.log("UserList Initializing");
+	 Util.log("UserList Initializing", Configurations.OUT_LOG);
 
-	 Util.log(typeSys+ " staring...");
+	 Util.log(typeSys+ " staring...", Configurations.OUT_LOG);
 	 role.startExecution();
 	 (new Thread(this.role)).start();
  }

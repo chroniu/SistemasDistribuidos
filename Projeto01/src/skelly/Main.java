@@ -1,5 +1,6 @@
 package skelly;
 
+import util.Configurations;
 import util.Util;
 
 import java.io.IOException;
@@ -20,11 +21,11 @@ public class Main {
 			String port = args[2];
 			String typeSys = args[3];
 
-			Util.log("System Parameters");
-			Util.log("identification: " + identification);
-			Util.log("ip: " + ip);
-			Util.log("port: " + port);
-			Util.log("typeSys: " + typeSys);
+			Util.log("System Parameters", Configurations.OUT_LOG);
+			Util.log("identification: " + identification, Configurations.OUT_LOG);
+			Util.log("ip: " + ip, Configurations.OUT_LOG);
+			Util.log("port: " + port, Configurations.OUT_LOG);
+			Util.log("typeSys: " + typeSys, Configurations.OUT_LOG);
 			
 			try {
 				new skelly.System(identification, ip, Integer.parseInt(port), typeSys);

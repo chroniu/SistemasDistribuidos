@@ -9,6 +9,7 @@ import Messages.GameMessageData;
 import Messages.MessageType;
 import Messages.SimpleMessageDataChecker;
 import Messages.ThrowMessageData;
+import util.Configurations;
 import util.Util;
 
 /**
@@ -59,6 +60,7 @@ public class GameServer implements Role {
 			default:
 				break;
 			}
+			Util.log("STATE: "+this.state, Configurations.OUT_INTERFACE);
 			Thread.sleep(sleepTime);
 			}catch(Exception e){
 				e.printStackTrace();
@@ -86,7 +88,7 @@ public class GameServer implements Role {
 				new GameMessageData(MessageType.MSG_TURN, this.gameState.getDecoder()).toByteArray());
 		msg.encryptMessage(privateKey);
 		MultiCastServer.getInstance().sendMessage(msg);
-		
+		Util.log("Sending Turn Message to: "+msg.receiver, Configurations.OUT_INTERFACE);
 		this.sleepTime = 1000;
 		state = STATE_WAITING_JOGADA;
 	}
@@ -133,8 +135,8 @@ public class GameServer implements Role {
 
 	public void receivedMsg(Message msg) {
 		Util.log("Received Message from: " + msg.sender
-				+ " not secured checked yet");
-		Util.log("Type Message from: " + msg.type);
+				+ " not secured checked yet", Configurations.OUT_INTERFACE);
+		Util.log("Type Message from: " + msg.type, Configurations.OUT_INTERFACE);
 
 		if (msg.type.equals(MessageType.MSG_KNOW)) {
 			SystemUsersList.processIdentityMessage(msg);
@@ -142,13 +144,13 @@ public class GameServer implements Role {
 			if(state!=STATE_WAITING_JOGADA) return; 
 			
 			if (msg.sender.equals(this.gameState.currentPlayerIdentification())){
-				Util.log("Checking Message Credentials");
+				Util.log("Checking Message Credentials", Configurations.OUT_INTERFACE);
 		 		msg.decryptMessage(SystemUsersList.getUserPublicKey(msg.sender));
 				ThrowMessageData messageData = new ThrowMessageData(msg.data);
 		 		if (messageData.valid) {
-					Util.log("Message is Valid");
+					Util.log("Message is Valid", Configurations.OUT_INTERFACE);
 					boolean acertou = gameState.updateState(messageData.aposta, msg.sender);
-					
+					Util.log("Acertou? "+acertou, Configurations.OUT_INTERFACE);
 					Message replyMsg;
 					try {
 						replyMsg = new Message(
@@ -166,28 +168,28 @@ public class GameServer implements Role {
 					}
 					state = STATE_NEXT_PLAYER;
 					checkEndOfGame();	
-					Util.log("User " + msg.sender + " apostou"+messageData.aposta);
+					Util.log("User " + msg.sender + " apostou"+messageData.aposta, Configurations.OUT_INTERFACE);
 				} else {
-					Util.log("Message is not valid - Wrong keys?");
+					Util.log("Message is not valid - Wrong keys?", Configurations.OUT_INTERFACE);
 				}
 				
 				
 			}else{
-				Util.log("Mensagem Throw de usuário incorreto: ");
+				Util.log("Mensagem Throw de usuário incorreto: ", Configurations.OUT_INTERFACE);
 			}
 		} else if (msg.type.equals(MessageType.MSG_I_WANT_TO_PLAY)) {
 			if(state != STATE_WAITING_FOR_PLAYERS) return;
 			
-			Util.log("Checking Message Credentials");
+			Util.log("Checking Message Credentials", Configurations.OUT_INTERFACE);
 			Util.log("Cheking User Existence: "
-					+ SystemUsersList.getUserPublicKey(msg.sender));
+					+ SystemUsersList.getUserPublicKey(msg.sender), Configurations.OUT_INTERFACE);
 			msg.decryptMessage(SystemUsersList.getUserPublicKey(msg.sender));
 			if (SimpleMessageDataChecker.validMessage(msg.type, msg.data)) {
-				Util.log("Message is Valid");
+				Util.log("Message is Valid", Configurations.OUT_INTERFACE);
 				gameState.addUserToGame(msg.sender);
-				Util.log("User " + msg.sender + " Want to Play");
+				Util.log("User " + msg.sender + " Want to Play", Configurations.OUT_INTERFACE);
 			} else {
-				Util.log("Message is not valid - Wrong keys?");
+				Util.log("Message is not valid - Wrong keys?", Configurations.OUT_INTERFACE);
 			}
 		}
 
@@ -205,8 +207,8 @@ public class GameServer implements Role {
 	}
 
 	public void newUserDiscovered(String identification, String typeSys) {
-		Util.log("New User DIscoverd By Game Server");
-		Util.log("id: " + identification + "  type: " + typeSys);
+		Util.log("New User DIscoverd By Game Server", Configurations.OUT_INTERFACE);
+		Util.log("id: " + identification + "  type: " + typeSys, Configurations.OUT_INTERFACE);
 
 		try {
 			Message msg = new Message(this.identification, identification,
@@ -222,7 +224,7 @@ public class GameServer implements Role {
 	}
 
 	public void userRemoved(String identification, String typeSys) {
-		Util.log("User Removed From Game Server");
-		Util.log("id: " + identification + "  type: " + typeSys);
+		Util.log("User Removed From Game Server", Configurations.OUT_INTERFACE);
+		Util.log("id: " + identification + "  type: " + typeSys, Configurations.OUT_INTERFACE);
 	}
 }

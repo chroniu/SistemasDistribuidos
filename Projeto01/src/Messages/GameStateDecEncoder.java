@@ -1,5 +1,7 @@
 package Messages;
 
+import java.util.Arrays;
+
 /**
  * Classe para o GameServer mandar o estado do jogo e mensagens para os Players
  * @author lucas
@@ -27,9 +29,9 @@ public class GameStateDecEncoder {
 		String erros_jogador = null, palavraAtual = null, letrasErradas = null;
 		
 		String pontuacao=null;
-		String [] strs = new String(data).split("|");
+		String [] strs = new String(data).split("@");
 		for(int i=0;i<strs.length;i++){
-			if(strs[i].startsWith("Erros:" )){
+			if(strs[i].startsWith("Erros")){
 				erros_jogador = strs[++i];
 			}else if(strs[i].startsWith("Letras Erradas" )){
 				letrasErradas = strs[++i];	
@@ -51,15 +53,23 @@ public class GameStateDecEncoder {
  
 	public byte[] toByteArray(){
 		String stb = "";
-		stb = "Erros|"+this.erros_jogador+"|";
-		stb += "Letras Erradas|"+(this.letrasErradas==null?"":this.letrasErradas)+"|";
-		stb += "Pontuacao|";
+		stb = "Erros@"+this.erros_jogador+"@";
+		stb += "Letras Erradas@"+(this.letrasErradas==null?"":this.letrasErradas)+"@";
+		stb += "Pontuacao@";
 		for(int i=0;i<pontuacao.length;i++){
 			stb+=pontuacao[i]+"$";
 		}
-		stb +="Palavra_Atual|"+palavraAtual;
+		stb +="@Palavra_Atual@"+palavraAtual;
 		 
 		return stb.getBytes();
+	}
+
+	@Override
+	public String toString() {
+		return "GameStateDecEncoder [erros_jogador=" + erros_jogador
+				+ ", letrasErradas=" + letrasErradas + ", pontuacao="
+				+ Arrays.toString(pontuacao) + ", palavraAtual=" + palavraAtual
+				+ "]";
 	}
 	
 }
