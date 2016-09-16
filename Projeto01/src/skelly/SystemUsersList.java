@@ -8,9 +8,11 @@ import Messages.KnowMessageData;
 import Messages.MessageType;
 import java.lang.System;
 
-/*
+/**
  * Classe auxiliar
+ * @author Lucas
  */
+
 class Node {
 	final String identification;
 	final String typeSys;
@@ -30,17 +32,23 @@ class Node {
 /**
  * Responsável por gerenciar a lista de usuários do sistema Armazena chaves e
  * identificações e tempo desde a última resposta Created by lucas on 07/09/16.
- * 
- * TODO -> COlocar um "tempo" 
  * Caso um usuário não tenha se comunicado em um limite de tempo, então tira-lo da lista
- * -> chamar alguma funlão para avisar o role
+ * -> chamar alguma função para avisar o role 
+ * @author Lucas
  */
-public class SystemUsersList implements Runnable {
+public class SystemUsersList implements Runnable, RoleListener {
 
 	private static ArrayList<Node> nodeList;
 	private static Message myKnowMessage;
 	private static Role role;
 
+	/**
+	 * Construtor
+	 * @param identification  String com a identificação 
+	 * @param typeSys         String com o tipo do sistema
+	 * @param myPublicKey     PublicKey chave publica
+	 * @param role            Role role
+	 */
 	public SystemUsersList(String identification, String typeSys, PublicKey myPublicKey, Role role) {
 		this.nodeList = new ArrayList<Node>();
 		KnowMessageData knm = new KnowMessageData(myPublicKey, typeSys);
@@ -53,7 +61,10 @@ public class SystemUsersList implements Runnable {
 		this.role = role;
 	}
 
-	// atualiza a lista de users
+	/**
+	 * Método que atualiza a lista de usuários
+	 * @param msg     Message mensagem
+	 */ 
 	public static void processIdentityMessage(Message msg) {
 		Util.log("Processing KNow Mesage from: "+msg.sender , Configurations.OUT_LOG);
 		if (!msg.type.equals(KnowMessageData.Identity)) {
@@ -77,6 +88,11 @@ public class SystemUsersList implements Runnable {
 		}
 	}
 	
+	/**
+	 * Método que retorna o nó de um usuários específico
+	 * @param identification    String com a identificação
+	 * @return Node
+	 */ 
 	private static Node getUserNode(String identification){
 		for (int i = 0; i < nodeList.size(); i++) {
 			if (nodeList.get(i).identification.equals(identification)) {
@@ -86,11 +102,20 @@ public class SystemUsersList implements Runnable {
 		return null;
 	}
 	
+	/**
+	 * Método que retorna a chave pública de um usuários específico
+	 * @param identification    String com a identificação
+	 * @return PublicKey
+	 */ 
 	public static PublicKey getUserPublicKey(String identification){
 		final Node node = getUserNode(identification);
 		return (node == null? null: node.publicKey);
 	}
 
+	/**
+	 * Método que retorna a identificação do servidor
+	 * @return String
+	 */ 
 	public static String getServerIdentification(){
 		for (int i = 0; i < nodeList.size(); i++) {
 			if (nodeList.get(i).typeSys.equals(MessageType.MSG_SERVER)) {
@@ -100,6 +125,10 @@ public class SystemUsersList implements Runnable {
 		return null;
 	}
 	
+	/**
+	 * Método que retorna a lista com todos os usuários
+	 * @return ArrayList<String>
+	 */ 
 	public static ArrayList<String> getTypeUserList(){
 		final ArrayList<String> list = new ArrayList<String>();
 		for (int i = 0; i < nodeList.size(); i++) {
@@ -110,7 +139,9 @@ public class SystemUsersList implements Runnable {
 		return list;
 	}
 	
-	// envia de tempos em tempos uma mensagem de identificação pra rede
+	/**
+	 * Método que envia de tempos em tempos uma mensagem de identificação pra rede
+	 */ 
 	public void run() {
 		while(true){
 			MultiCastServer.getInstance().sendMessage(myKnowMessage);
@@ -127,6 +158,9 @@ public class SystemUsersList implements Runnable {
 		}
 	}
 
+	/**
+	 * Método que verifica se o usuário passou do tempo limite do envio da verificação de que continua na rede
+	 */
 	private void checkUserTimeOut() {
 		ArrayList<Node> toRemove = new ArrayList<Node>(); 
 		long timeNow = System.currentTimeMillis();
@@ -139,5 +173,10 @@ public class SystemUsersList implements Runnable {
 		nodeList.remove(toRemove);
 		
 	}
+
+	public void roleChanger(Role newRole) {
+		 role = newRole;
+	}
+ 
 
 }

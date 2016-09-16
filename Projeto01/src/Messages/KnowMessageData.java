@@ -8,10 +8,8 @@ import util.Configurations;
 import util.Util;
 
 /**
- * Estrutra do KnowMessage 1 [Byte] +
- * 
- * @author lucas
- * 
+ * Estrutra do KnowMessage 1 [Byte]
+ * @author Lucas
  */
 
 public class KnowMessageData {
@@ -21,6 +19,10 @@ public class KnowMessageData {
 	public final String typeSys;
 	public static final String Identity = MessageType.MSG_KNOW;
 
+	/**
+	 * Construtor
+	 * @param data     byte[] data
+	 */
 	public KnowMessageData(byte[] data) {
 		PublicKey key;
 		boolean valid;
@@ -47,12 +49,21 @@ public class KnowMessageData {
 				: MessageType.MSG_USER);
 	}
 
+	/**
+	 * Construtor
+	 * @param publickey    PublicKey a chave pública
+	 * @param typeSys      String o tipo de sistema
+	 */
 	public KnowMessageData(PublicKey publicKey, String typeSys) {
 		this.publicKey = publicKey;
 		this.typeSys = typeSys;
 		this.valid = true;
 	}
 
+	/**
+	 * Metodo que transforma o knownMessageData em um array de bytes 
+	 * @return byte[] 
+	 */
 	public byte[] toByteArray() {
 		if (!valid)
 			return null;

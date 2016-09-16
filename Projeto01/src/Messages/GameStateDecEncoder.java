@@ -4,31 +4,45 @@ import java.util.Arrays;
 
 /**
  * Classe para o GameServer mandar o estado do jogo e mensagens para os Players
- * @author lucas
- *
+ * @author Lucas
  */
+
 public class GameStateDecEncoder {
 	public final int erros_jogador;
 	public final String palavraAtual;
 	public final String letrasErradas;
 	public final String []pontuacao;
 	public final boolean valid;
-	
-	
+//	public final int vezesPerdidas;
+
+	/**
+	 * Construtor
+	 * @param erros_jogador   int erros do jogador
+	 * @param palavraAtual    String com a palavra atual
+	 * @param letrasErradas   String com as letras erradas
+	 * @param pontuacao       String[] com a pontuação de cada jogador
+	 */
 	public GameStateDecEncoder(int erros_jogador, String palavraAtual,
 			String letrasErradas, String[] pontuacao) {
+//		public GameStateDecEncoder(int erros_jogador, String palavraAtual,
+//				String letrasErradas, String[] pontuacao, int vezesPerdidas) {
 		super();
 		this.erros_jogador = erros_jogador;
 		this.palavraAtual = palavraAtual;
 		this.letrasErradas = letrasErradas;
 		this.pontuacao = pontuacao;
 		this.valid = (this.palavraAtual!=null) && (this.pontuacao!=null);
+//		this.vezesPerdidas=vezesPerdidas;
 	}
 	
+	/**
+	 * Construtor
+	 * @param data      byte[] data
+	 */
 	public GameStateDecEncoder(byte[] data){
 		String erros_jogador = null, palavraAtual = null, letrasErradas = null;
-		
 		String pontuacao=null;
+//		String vezesPerdidas =null;
 		String [] strs = new String(data).split("@");
 		for(int i=0;i<strs.length;i++){
 			if(strs[i].startsWith("Erros")){
@@ -39,12 +53,15 @@ public class GameStateDecEncoder {
 				pontuacao = strs[++i]; 
 			}else if(strs[i].startsWith("Palavra_Atual" )){
 				palavraAtual = strs[++i];
+//			}else if(strs[i].startsWith("Vezes")){
+//				vezesPerdidas = strs[++i];
 			}
 		}
 		if(erros_jogador==null){
 			System.out.print("x");
 		}
 		this.erros_jogador = Integer.parseInt(erros_jogador);
+//		this.vezesPerdidas = Integer.parseInt(vezesPerdidas);
 		this.palavraAtual = palavraAtual;
 		this.letrasErradas = letrasErradas;
 		this.pontuacao = pontuacao.split("x");
@@ -52,7 +69,11 @@ public class GameStateDecEncoder {
 		this.valid = (this.palavraAtual!=null) && (this.pontuacao!=null);
 
 	}
- 
+ 	
+	/**
+	 * Método que coloca os atributos num vetor de bytes
+	 * @return byte[] 
+	 */
 	public byte[] toByteArray(){
 		String stb = "";
 		stb = "Erros@"+this.erros_jogador+"@";
@@ -62,16 +83,17 @@ public class GameStateDecEncoder {
 			stb+=pontuacao[i]+"x";
 		}
 		stb +="@Palavra_Atual@"+palavraAtual;
-		 
+//		stb +="Vezes@"+this.vezesPerdidas+"@";
 		return stb.getBytes();
 	}
 
 	@Override
 	public String toString() {
-		return "GameStateDecEncoder [Seus Erros = " + erros_jogador
-				+ "\nletrasErradas=" + letrasErradas + "\npontuacao="
-				+ Arrays.toString(pontuacao) + "\nPalavra Atual =" + palavraAtual
-				+ "]";
+		return "Seus Erros: " + erros_jogador
+//				+ "Vezes Perdidas: " + vezesPerdidas
+				+ "\nletrasErradas:" + letrasErradas + "\npontuacao:"
+				+ Arrays.toString(pontuacao) + "\nPalavra Atual:" + palavraAtual
+				+ "";
 	}
 	
 }

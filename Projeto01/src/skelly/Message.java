@@ -14,38 +14,48 @@ import util.Util;
 import java.awt.MultipleGradientPaint.CycleMethod;
 import java.lang.System;;
 
-/*
+/**
  * Classe que representa uma mensagem
  * Possui campos para indicar quem enviou, pra quem é, qual o tipo e os dados da mensagem
  * Possui métodos para criptografar e descriptografar mensagens.
+ * @author Lucas
  */
 class Message {
+	private final int TAMANHO_MAX_BLOCO_TO_ENCRIPTAR = 1000;//117;
+	private final int TAMANHO_BLOCO_ENCRIPTADO = 1000; //128
+
 	final String sender;
 	final String receiver;
 	final String type;
 	byte[] data;
 	final Cipher chiper;
 
+	/**
+	 * Construtor
+	 * @param sender      String com quem enviou a mensagem
+	 * @param receiver    String com quem irá receber a mensagem
+	 * @param type        String com o tipo da mensagem
+	 * @param data        byte[] data
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchPaddingException
+	 */
 	public Message(String sender, String receiver, String type, byte[] data) throws NoSuchAlgorithmException, NoSuchPaddingException
 			 {
 		this.sender = sender;
 		this.receiver = receiver;
 		this.data = data;
 		this.type = type;
-		this.chiper = Cipher.getInstance(Configurations.CryptoAlgorithm);
-		
-		
+		this.chiper = Cipher.getInstance(Configurations.CryptoAlgorithm);		
 	}
 	
-	private final int TAMANHO_MAX_BLOCO_TO_ENCRIPTAR = 1000;//117;
-	private final int TAMANHO_BLOCO_ENCRIPTADO = 1000; //128
 	
-	/*
-	 * Encripta a mensagem localizada em @data
+	/**
+	 * Método que encripta a mensagem localizada em @data
+	 * @param key   PrivateKey chave que será encriptada
 	 */
 	public void encryptMessage(PrivateKey key) {
 		Util.log("Encriptando mensagem. DataSize: "+data.length, Configurations.OUT_LOG);
-Util.log("Descriptando mensagem: data.size "+data.length, Configurations.OUT_LOG);
+		Util.log("Descriptando mensagem: data.size "+data.length, Configurations.OUT_LOG);
 		if (data == null) {
 			Util.log("MSG Data not definited", Configurations.OUT_LOG);
 			return;
@@ -72,8 +82,9 @@ Util.log("Descriptando mensagem: data.size "+data.length, Configurations.OUT_LOG
 	}
 	
 	
-	/*
-	 * Decripta a mensagem localizada em @data
+	/**
+	 * Método que decripta a mensagem localizada em @data 
+	 * @param key   PublicKey que será decriptada
 	 */
 	public void decryptMessage(PublicKey key) {
 		Util.log("Descriptando mensagem: data.size "+data.length, Configurations.OUT_LOG);
@@ -105,6 +116,9 @@ Util.log("Descriptando mensagem: data.size "+data.length, Configurations.OUT_LOG
 		
 	}
 
+	/**
+	 * Método que transforma a Message em um vetor de bytes
+	 */
 	public byte[] toByteArray(){
 		byte[] buf = new byte[16 * 3 + this.data.length];
 		final byte[] senderx = sender.getBytes();

@@ -3,28 +3,42 @@ package Messages;
 import util.Util;
 
 /**
- * Classe para as mensagens do tipo
+ * Classe para as mensagens dos tipos:
  * GameStarted;
  * GameEndend;
  * ThrowReply;
- * Turn
- * @author lucas
- *
+ * Turn.
+ * @author Lucas
  */
+
 public class GameMessageData {
 	public final String serverMessage;
 	public final GameStateDecEncoder state;
 	
+
+	/**
+	 * Construtor 
+	 * @param messageType  string com o tipo da mensagem
+	 * @param state    GameStateDecEnconder com o estado do jogo
+	 */
 	public GameMessageData(String messageType, GameStateDecEncoder state){
 		this.serverMessage = messageType;
 		this.state = state;
 	}
 	
+	/**
+	 * Construtor 
+	 * @param data  Byte[] data
+	 */
 	public GameMessageData(byte [] data){
 		this.serverMessage = new String(Util.range(data, 0, 20)).trim();
 		this.state = new GameStateDecEncoder(Util.range(data, 20));
 	}
 	
+	/**
+	 * Metodo que transforma o GameStateDecEncoder em um array de bytes 
+	 * @return  byte[]
+	 */
 	public byte []toByteArray(){
 		byte [] stateData = this.state.toByteArray();
 		byte [] buff = new byte[20 + stateData.length];

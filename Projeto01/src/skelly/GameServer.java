@@ -2,6 +2,7 @@ package skelly;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.util.ArrayList;
 import java.lang.System;
 import javax.crypto.NoSuchPaddingException;
 import Messages.GameMessageData;
@@ -14,13 +15,13 @@ import util.Util;
 /**
  * Classe que implementa o papel de gerador de palavras
  * @author lucas
- *
  */
+
 public class GameServer implements Role {
 	private GameState gameState;
 	private final String identification;
 	private final PrivateKey privateKey;
-
+	private final ArrayList<RoleListener> myListeners;
 	private int state;
 
 	private final int STATE_WAITING_FOR_PLAYERS = 1;
@@ -28,18 +29,32 @@ public class GameServer implements Role {
 	private final int STATE_NEXT_PLAYER = 3 ;
 	private final int STATE_WAITING_JOGADA = 4;
 	private final int STATE_GAME_ENDED = 5;
-	private long sleepTime;
-	private long timerVeriify;
+	private final int STATE_ROLE_CHANGED = 6;
 	
+	private boolean first_try = true;
+	private long sleepTime;
+	private long timerVerify;
+	
+	
+	/**
+	 * Construtor
+	 * @param identification    String com a identificação
+	 * @param privateKey        PrivateKey chave privade
+	 */
 	public GameServer(String identification, PrivateKey privateKey) {
 		this.identification = identification;
 		this.privateKey = privateKey;
 		this.sleepTime = 0;
-		this.timerVeriify = -1;
+		this.timerVerify = -1;
+		this.myListeners = new ArrayList<RoleListener>();
 	}
 
+	/**
+	 * Método que indica o estado que o servidor vai estar
+	 */
 	public void run() {
-		while (true) {
+		boolean continuar = true;
+		while (continuar) {
 			try{
 			
 			switch (this.state) {
@@ -59,6 +74,8 @@ public class GameServer implements Role {
 				stateGameEnded();
 				startExecution();
 				break;
+			case STATE_ROLE_CHANGED:
+				continuar = false;
 			default:
 				break;
 			}
@@ -71,12 +88,15 @@ public class GameServer implements Role {
 
 	}
 	
-	
-
+	/**
+	 * Método que avisa que o o jogo acabou
+	 */
 	private void stateGameEnded() { 
 		try{
+			
 			Message msg = new Message(this.identification, MessageType.DEST_ALL, MessageType.MSG_GAME_ENDED, 
-					new GameMessageData("FIM DE JOGO", this.gameState.getDecoder()).toByteArray());
+					new GameMessageData("VENCEDOR:" +this.gameState.winnerPlayerIdentification(),
+							this.gameState.getDecoder()).toByteArray());
 			msg.encryptMessage(privateKey);
 			MultiCastServer.getInstance().sendMessage(msg);
 			Util.log("Sending Reply Message to: "+msg.receiver+ " Game_ENDED", Configurations.OUT_INTERFACE);
@@ -84,43 +104,83 @@ public class GameServer implements Role {
 			this.sleepTime = 1;
 		}catch(Exception e){
 			e.printStackTrace();
-		}
-	
-		
+		}		
 	}
 
-	private void stateWaitingJogada() {
-		if((System.currentTimeMillis() - this.timerVeriify ) > Configurations.MAX_TIME_TO_PLAY){
+	/**
+	 * Método que fica esperando a jogada do jogador 
+	 */
+	private void stateWaitingJogada() {	
+		if((System.currentTimeMillis() - this.timerVerify ) > (this.first_try? Configurations.MAX_TIME_TO_PLAY_LETTER : Configurations.MAX_TIME_TO_PLAY_WORD ))	{	
 			try{
-				Message msg = new Message(this.identification, this.gameState.currentPlayerIdentification(), MessageType.MSG_THROW_REPLY, 
-						new GameMessageData("PERDEU A VEZ", this.gameState.getDecoder()).toByteArray());
-				msg.encryptMessage(privateKey);
-				MultiCastServer.getInstance().sendMessage(msg);
-				Util.log("Sending Reply Message to: "+msg.receiver+ " Perdeu a vez", Configurations.OUT_INTERFACE);
+				if (this.first_try){
+					this.gameState.perdeuVez();
+					
+				}
+				
+				if(!this.gameState.userIsInGame(this.gameState.currentPlayerIdentification())){
+					Message replyMsg;
+					try {
+						replyMsg = new Message(
+								this.identification,
+								this.gameState.currentPlayerIdentification(),
+								MessageType.MSG_GAME_ENDED,
+								new GameMessageData("Demorou: Perdeu", this.gameState.getDecoder()).toByteArray());
+						replyMsg.encryptMessage(privateKey);
+						MultiCastServer.getInstance().sendMessage(replyMsg);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}else{
+					Message msg = new Message(this.identification, this.gameState.currentPlayerIdentification(), MessageType.MSG_THROW_REPLY_WORD, 
+							new GameMessageData(this.first_try?"PERDEU A VEZ":"PASSOU A VEZ", this.gameState.getDecoder()).toByteArray());
+					msg.encryptMessage(privateKey);
+					MultiCastServer.getInstance().sendMessage(msg);
+					Util.log("Sending Reply Message to: "+msg.receiver+ " Perdeu a vez", Configurations.OUT_INTERFACE);	
+				}
+				this.first_try=false;
 			}catch(Exception e){
 				e.printStackTrace();
 			}
-			
-			this.state = STATE_NEXT_PLAYER;
-			this.sleepTime = 1;
-		}else this.sleepTime = 1000;  ///TODO colocar um timer pra se o jogador não mandar, perder a vez, mandando uma mensagen ThowReply
+				this.state = STATE_NEXT_PLAYER;
+				this.sleepTime = 1;
+		}else this.sleepTime = 1000;  
 	}
 
+	/**
+	 * Método que avisa o proximo jogador que é a vez dele jogar
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchPaddingException
+	 */
 	private void stateGameNextPlayer() throws NoSuchAlgorithmException, NoSuchPaddingException {
-		String nextPlayerId = this.gameState.getNextPlayer();
+		String nextPlayerId;
+		Message msg;
+		if(!this.first_try){
+			nextPlayerId = this.gameState.getNextPlayer();
+			this.first_try=true;
+			msg = new Message(this.identification, nextPlayerId, MessageType.MSG_TURN, 
+					new GameMessageData(MessageType.MSG_TURN, this.gameState.getDecoder()).toByteArray());
+			msg.encryptMessage(privateKey);
+			MultiCastServer.getInstance().sendMessage(msg);
+			Util.log("Sending Turn Message to: "+msg.receiver, Configurations.OUT_INTERFACE);
+
+		}
+		else{
+			this.first_try=false;
+		}
 		
-		Message msg = new Message(this.identification, nextPlayerId, MessageType.MSG_TURN, 
-				new GameMessageData(MessageType.MSG_TURN, this.gameState.getDecoder()).toByteArray());
-		msg.encryptMessage(privateKey);
-		MultiCastServer.getInstance().sendMessage(msg);
-		Util.log("Sending Turn Message to: "+msg.receiver, Configurations.OUT_INTERFACE);
 		this.sleepTime = 1000;
-		this.timerVeriify = System.currentTimeMillis();
+		this.timerVerify = System.currentTimeMillis();
 		state = STATE_WAITING_JOGADA;
+		checkEndOfGame();
 	}
 
-	private void stateGameStarted() throws NoSuchAlgorithmException, NoSuchPaddingException {
-		 
+	/**
+	 * Método que avisa que o jogo começou
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchPaddingException
+	 */
+	private void stateGameStarted() throws NoSuchAlgorithmException, NoSuchPaddingException {	 
 		this.sleepTime = 1000;
 		this.gameState.getNextPlayer();
 		Message msg = new Message(
@@ -133,6 +193,9 @@ public class GameServer implements Role {
 		state =  STATE_NEXT_PLAYER;
 	}
 
+	/**
+	 * Método que o servidor fica esperando atingir o número mínimo de jogadores para iniciar o jogo
+	 */
 	private void stateWaitingForPlayers() {
 		if(gameState.getNumPlayers() >=2){
 			state=STATE_GAME_STARTED;
@@ -159,6 +222,10 @@ public class GameServer implements Role {
 
 	}
 
+	/**
+	 * Método que indica o que o servidor tem que fazer com base na mensagem recebida
+	 * @param msg    Message mensagem
+	 */
 	public void receivedMsg(Message msg) {
 		Util.log("Received Message from: " + msg.sender
 				+ " not secured checked yet", Configurations.OUT_INTERFACE);
@@ -184,9 +251,9 @@ public class GameServer implements Role {
 							replyMsg = new Message(
 									this.identification,
 									msg.sender,
-									MessageType.MSG_THROW_REPLY,
+									(this.first_try? MessageType.MSG_THROW_REPLY_LETTER  : MessageType.MSG_THROW_REPLY_WORD),
 									new GameMessageData((acertou? "Acertou": "Errou"), this.gameState.getDecoder()).toByteArray());
-							
+									
 							replyMsg.encryptMessage(privateKey);
 							MultiCastServer.getInstance().sendMessage(replyMsg);
 							
@@ -238,34 +305,40 @@ public class GameServer implements Role {
 
 	}
 
+	/**
+	 * Método que verifica se o jogo acabou
+	 */
 	private void checkEndOfGame() {
 		if(this.gameState.gameEnded()){
 			state = STATE_GAME_ENDED;
 		}
 	}
 
+	/**
+	 * Método que inicia a partida
+	 */
 	public void startExecution() {
-		this.gameState = new GameState("Seleciona Palavra");
+		
+		this.gameState = new GameState();
 		this.state = STATE_WAITING_FOR_PLAYERS;
 	}
 
+
+	/**
+	 * Metodo que indica se um novo usuário foi descoberto na rede
+	 * @param identification    String com a identificação
+	 * @param typeSys           String com o tipo do sistema
+	 */
 	public void newUserDiscovered(String identification, String typeSys) {
 		Util.log("New User DIscoverd By Game Server", Configurations.OUT_INTERFACE);
 		Util.log("id: " + identification + "  type: " + typeSys, Configurations.OUT_INTERFACE);
-
-//		try {
-//			Message msg = new Message(this.identification, identification,
-//					MessageType.MSG_DO_WANT_PLAY,
-//					SimpleMessageDataChecker
-//							.getDataForMessage(MessageType.MSG_DO_WANT_PLAY));
-//			msg.encryptMessage(privateKey);
-//			MultiCastServer.getInstance().sendMessage(msg);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-
 	}
 
+	/**
+	 * Metodo que indica se um usuário foi removido da rede
+	 * @param identification    String com a identificação
+	 * @param typeSys           String com o tipo do sistema
+	 */
 	public void userRemoved(String identification, String typeSys) {
 		Util.log("User Removed From Game Server", Configurations.OUT_INTERFACE);
 		Util.log("id: " + identification + "  type: " + typeSys, Configurations.OUT_INTERFACE);
@@ -273,5 +346,22 @@ public class GameServer implements Role {
 		if(this.gameState.gameEnded()){
 			this.state = STATE_GAME_ENDED;
 		}
+	}
+
+	public void addRoleListener(RoleListener listener) {
+		this.myListeners.add(listener);
+	}
+	public void addRoleListener(ArrayList<RoleListener> listener) {
+		this.myListeners.addAll(listener);
+	}
+
+	public void changeRole() {
+		 Role role = new GameServer(this.identification, this.privateKey);
+		 this.myListeners.clear();
+		  for (RoleListener listener : this.myListeners) {
+			 listener.roleChanger(role);
+		  }
+		 (new Thread(role)).start();
+		
 	}
 }

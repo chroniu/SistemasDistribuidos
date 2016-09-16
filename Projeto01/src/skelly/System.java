@@ -7,11 +7,12 @@ import java.security.KeyPair;
 
 import Messages.MessageType;
 /**
- * Principal que controla o sistema.
+ * Classe principal que controla o sistema.
  * Inicializa 3 Threads
  * SustemUserList -> Responsável pelo reconhecimento e troca de chaves
- * Created by lucas on 07/09/16.
+ * @author lucas 
  */
+
 class System{
  final String identification;
  final String ip;
@@ -21,6 +22,15 @@ class System{
  final Role role;
  final MultiCastServer server;
  
+
+ /**
+  * Construtor
+  * @param identification    String com a identificação
+  * @param ip                String com o ip
+  * @param port              int com o numéro da porta que será ouvida
+  * @param typesys           String com o tipo de sistema
+  * @throws IOException
+  */
  public System(String identification, String ip, int port, String typeSys) throws IOException {
 	Util.log("Initialising "+identification+  " Type: "+typeSys, Configurations.OUT_LOG);
 	
@@ -48,12 +58,14 @@ class System{
 	 
 	 //(new Thread(this.server)).start();
  	//inicializa a Thread responsável por criar e manter a lista de usuarios do sistema
-	 (new Thread(new SystemUsersList(this.identification, this.typeSys, this.keyPair.getPublic(), this.role))).start();
+	 SystemUsersList sul = new SystemUsersList(this.identification, this.typeSys, this.keyPair.getPublic(), this.role);
+	 (new Thread(sul)).start();
 
 	 Util.log("UserList Initializing", Configurations.OUT_LOG);
 
 	 Util.log(typeSys+ " staring...", Configurations.OUT_LOG);
-	 role.startExecution();
+	 role.addRoleListener(this.server);
+	 role.addRoleListener(sul); 
 	 (new Thread(this.role)).start();
  }
 }

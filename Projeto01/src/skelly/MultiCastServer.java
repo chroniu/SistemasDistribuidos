@@ -7,6 +7,8 @@ import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.ServerSocket;
 
+import org.omg.PortableInterceptor.SUCCESSFUL;
+
 import Messages.MessageType;
 
 import util.Configurations;
@@ -16,22 +18,28 @@ import util.Util;
  * Classe atua como um servidor Multicast. Possui funções de envio e recebimento
  * de mensagens.
  * Automaticamente repassa as mensagens chegadas à um "ouvinte", que será um PLayer ou GameServer
- * 
- * @addres -> Endereço do Multicast
- * @port -> Porta
- * @receiveCallBack -> Método chamado quando uma mensagem é recebida
+ * @author Lucas
  */
-class MultiCastServer implements Runnable {
+
+class MultiCastServer implements Runnable, RoleListener {
 	private static MultiCastServer instance;
 	
 	final String address;
 	final int port;
 	final String identification;
-	final ListenerMessage receiveCallBack;
+	private ListenerMessage receiveCallBack;
 	final MulticastSocket socket;
 	final InetAddress multicastAddressGroup;
 	final ServerSocket serverSocket;
 
+	/**
+	 * Contrutor
+	 * @param address            String com o endereço do multicast
+	 * @param port               int com o númer da porta 
+	 * @param identification     String com a identificação
+	 * @param receiverCallBack   ListenerMessage 
+	 * @throws IOException
+	 */
 	public MultiCastServer(String address, int port, String identification, ListenerMessage receiverCallBack) throws IOException {
 		 
 			this.address = address;
@@ -48,10 +56,18 @@ class MultiCastServer implements Runnable {
 			this.instance = this;
 	}
 	
+	/**
+	 * Método que retorna uma instância da classe
+	 * @return MulticastServer
+	 */
 	public static MultiCastServer getInstance(){
 		return instance;
 	}
 
+	/**
+	 * Método que envia uma mensagem
+	 * @param msg   Message mensagem
+	 */
 	public void sendMessage(Message msg) {
 		try {
 			Util.log("Sending Message from: " + msg.sender + " to: "
@@ -67,7 +83,9 @@ class MultiCastServer implements Runnable {
 
 	}
 
-	// recebe pacotes e despacha
+	/**
+	 * Método que recebe e despacha pacotes
+	 */
 	public void run() {
 		while (true) {
 			byte[] buffer = new byte[2048];
@@ -82,12 +100,9 @@ class MultiCastServer implements Runnable {
 				if(sender.equals(this.identification)){
 					//mensagem enviada pelo servidor. não precisa abrir
 				}else if (receiver.equals(identification)|| receiver.equals(MessageType.DEST_ALL)) {
-				//	Util.log("Recebendo Datagrama: "+datagramData.length);
-				//	Util.log("Received Message From " + sender);
 
 					Message msg = new Message(sender, receiver, type, (Util.range(
 							data.getData(), 16 * 3, data.getLength())));
-	//				Util.log("MSG data: "+msg.data.length);
 					
 					this.receiveCallBack.receivedMsg(msg);
 
@@ -99,5 +114,9 @@ class MultiCastServer implements Runnable {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void roleChanger(Role role) {
+		receiveCallBack = role;
 	}
 }

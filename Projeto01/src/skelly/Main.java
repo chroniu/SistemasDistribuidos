@@ -9,8 +9,8 @@ import java.lang.System;
 /**
  * Classe main, somente le as configurações de entrada e repassa pra classe System
  * @author lucas
- *
  */
+
 public class Main {
 
 	public static void main(String[] args) {
