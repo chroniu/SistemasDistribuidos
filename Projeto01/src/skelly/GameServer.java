@@ -362,6 +362,6 @@ public class GameServer implements Role {
 			 listener.roleChanger(role);
 		  }
 		 (new Thread(role)).start();
-		
+		role.startExecution();
 	}
 }

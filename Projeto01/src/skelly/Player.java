@@ -303,5 +303,6 @@ public class Player implements Role{
 			 listener.roleChanger(role);
 		  }
 		 (new Thread(role)).start();
+		 role.startExecution();
 	}
 }
