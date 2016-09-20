@@ -49,6 +49,7 @@ public class GameServer implements Role {
 		this.privateKey = privateKey;
 		this.sleepTime = 0;
 		this.timerVerify = -1;
+		this.state = - 1;
 		this.myListeners = new ArrayList<RoleListener>();
 	}
 
@@ -238,13 +239,16 @@ public class GameServer implements Role {
 	 * @param msg    Message mensagem
 	 */
 	public void receivedMsg(Message msg) {
+		
 		Util.log("Received Message from: " + msg.sender
-				+ " not secured checked yet", Configurations.OUT_INTERFACE);
-		Util.log("Type Message from: " + msg.type, Configurations.OUT_INTERFACE);
+				+ " not secured checked yet", Configurations.OUT_LOG);
+		Util.log("Type Message from: " + msg.type, Configurations.OUT_LOG);
 
 		if (msg.type.equals(MessageType.MSG_KNOW)) {
 			SystemUsersList.processIdentityMessage(msg);
-		} else if (msg.type.equals(MessageType.MSG_THROW)) {
+		}
+		if(this.state == -1) return;
+		if (msg.type.equals(MessageType.MSG_THROW)) {
 			if(state!=STATE_WAITING_JOGADA) return; 
 			
 			if (msg.sender.equals(this.gameState.currentPlayerIdentification())){
@@ -329,6 +333,7 @@ public class GameServer implements Role {
 	 * Método que inicia a partida
 	 */
 	public void startExecution() {
+		this.state = -1;
 		String palavraCorreta ="";
 		Scanner s = new Scanner(System.in);		
 		Util.log("Entre com a palavra correta:", Configurations.OUT_INTERFACE);
