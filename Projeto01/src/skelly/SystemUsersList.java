@@ -2,6 +2,8 @@ package skelly;
  
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Random;
+
 import util.Configurations;
 import util.Util;
 import Messages.KnowMessageData;
@@ -15,7 +17,7 @@ import java.lang.System;
 
 class Node {
 	final String identification;
-	final String typeSys;
+	String typeSys;
 	final PublicKey publicKey;
 	long timeFromLastMsg;
 
@@ -158,6 +160,11 @@ public class SystemUsersList implements Runnable, RoleListener {
 		}
 	}
 
+	public static String chooseNextServer(){
+		if(nodeList.size() == 0) return myKnowMessage.sender;
+		Random random = new Random();
+		return nodeList.get(random.nextInt(nodeList.size())).identification;
+	}
 	/**
 	 * Método que verifica se o usuário passou do tempo limite do envio da verificação de que continua na rede
 	 */
@@ -176,6 +183,13 @@ public class SystemUsersList implements Runnable, RoleListener {
 
 	public void roleChanger(Role newRole) {
 		 role = newRole;
+	}
+
+	public static void updateServerIdentification(String novoServer) {
+		String serverAtual = getServerIdentification();
+		Node node = getUserNode(serverAtual);
+		node.typeSys = MessageType.MSG_USER;
+		getUserNode(novoServer).typeSys = MessageType.MSG_SERVER;
 	}
  
 

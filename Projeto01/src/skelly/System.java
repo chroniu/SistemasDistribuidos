@@ -65,7 +65,7 @@ class System{
 
 	 Util.log(typeSys+ " staring...", Configurations.OUT_LOG);
 	 role.addRoleListener(this.server);
-	 role.addRoleListener(sul); 
+	 role.addRoleListener(sul);
 	 role.startExecution();
 	 (new Thread(this.role)).start();
  }

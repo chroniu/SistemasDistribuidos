@@ -8,7 +8,7 @@ import util.Configurations;
 import util.Util;
 
 /**
- * Estrutra do KnowMessage 1 [Byte]
+ * Estrutura do KnowMessage 1 [Byte]
  * @author Lucas
  */
 

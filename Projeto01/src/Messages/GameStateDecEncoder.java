@@ -13,6 +13,7 @@ public class GameStateDecEncoder {
 	public final String letrasErradas;
 	public final String []pontuacao;
 	public final boolean valid;
+//	public String novoServer;
 //	public final int vezesPerdidas;
 
 	/**
@@ -32,7 +33,7 @@ public class GameStateDecEncoder {
 		this.letrasErradas = letrasErradas;
 		this.pontuacao = pontuacao;
 		this.valid = (this.palavraAtual!=null) && (this.pontuacao!=null);
-//		this.vezesPerdidas=vezesPerdidas;
+//		this.novoServer = null; 
 	}
 	
 	/**
@@ -42,7 +43,7 @@ public class GameStateDecEncoder {
 	public GameStateDecEncoder(byte[] data){
 		String erros_jogador = null, palavraAtual = null, letrasErradas = null;
 		String pontuacao=null;
-//		String vezesPerdidas =null;
+		String novoServer = null;
 		String [] strs = new String(data).split("@");
 		for(int i=0;i<strs.length;i++){
 			if(strs[i].startsWith("Erros")){
@@ -53,19 +54,19 @@ public class GameStateDecEncoder {
 				pontuacao = strs[++i]; 
 			}else if(strs[i].startsWith("Palavra_Atual" )){
 				palavraAtual = strs[++i];
-//			}else if(strs[i].startsWith("Vezes")){
-//				vezesPerdidas = strs[++i];
 			}
+//			}else if(strs[i].startsWith("NovoServer")){
+//				novoServer = strs[++i];
+//			}
 		}
 		if(erros_jogador==null){
 			System.out.print("x");
 		}
 		this.erros_jogador = Integer.parseInt(erros_jogador);
-//		this.vezesPerdidas = Integer.parseInt(vezesPerdidas);
 		this.palavraAtual = palavraAtual;
 		this.letrasErradas = letrasErradas;
 		this.pontuacao = pontuacao.split("x");
-	
+//		this.novoServer = novoServer;
 		this.valid = (this.palavraAtual!=null) && (this.pontuacao!=null);
 
 	}
@@ -83,7 +84,7 @@ public class GameStateDecEncoder {
 			stb+=pontuacao[i]+"x";
 		}
 		stb +="@Palavra_Atual@"+palavraAtual;
-//		stb +="Vezes@"+this.vezesPerdidas+"@";
+//		stb +="NovoServer@"+(this.novoServer == null?"NULL":this.novoServer);
 		return stb.getBytes();
 	}
 

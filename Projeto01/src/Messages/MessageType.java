@@ -44,5 +44,6 @@ public class MessageType {
  
 	// mensagem do jogador para o servidor avisando que quer jogar
 	public static final String MSG_I_WANT_TO_PLAY ="MSG_I_WANT_TO_P";
+	public static final String MSG_CHANGE_SERVER ="CHANGE_SERVER";
 	
 }

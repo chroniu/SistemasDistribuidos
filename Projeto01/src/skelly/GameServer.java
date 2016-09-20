@@ -5,11 +5,14 @@ import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.lang.System;
 import javax.crypto.NoSuchPaddingException;
+
+import Messages.ChangeServerMessageData;
 import Messages.GameMessageData;
 import Messages.MessageType;
 import Messages.SimpleMessageDataChecker;
 import Messages.ThrowMessageData;
 import util.Configurations;
+import java.util.Scanner;
 import util.Util;
 
 /**
@@ -24,7 +27,7 @@ public class GameServer implements Role {
 	private final ArrayList<RoleListener> myListeners;
 	private int state;
 
-	private final int STATE_WAITING_FOR_PLAYERS = 1;
+	private final int STATE_WAITING_FOR_PLAYERS = 0;
 	private final int STATE_GAME_STARTED = 2;
 	private final int STATE_NEXT_PLAYER = 3 ;
 	private final int STATE_WAITING_JOGADA = 4;
@@ -53,6 +56,8 @@ public class GameServer implements Role {
 	 * Método que indica o estado que o servidor vai estar
 	 */
 	public void run() {
+		Util.log("Inicializando Thread GameServer", Configurations.OUT_INTERFACE);
+		
 		boolean continuar = true;
 		while (continuar) {
 			try{
@@ -72,9 +77,11 @@ public class GameServer implements Role {
 				break;
 			case STATE_GAME_ENDED:
 				stateGameEnded();
-				startExecution();
+				//startExecution();
 				break;
 			case STATE_ROLE_CHANGED:
+				sendChangeRoleMessage();
+				this.changeRole();
 				continuar = false;
 			default:
 				break;
@@ -85,6 +92,7 @@ public class GameServer implements Role {
 				e.printStackTrace();
 			}
 		}
+		Util.log("Finalizando Thread GameServer", Configurations.OUT_INTERFACE);
 
 	}
 	
@@ -101,10 +109,13 @@ public class GameServer implements Role {
 			MultiCastServer.getInstance().sendMessage(msg);
 			Util.log("Sending Reply Message to: "+msg.receiver+ " Game_ENDED", Configurations.OUT_INTERFACE);
 			Thread.sleep(Configurations.TIMER_GAME_ENDED);
+			this.state = STATE_ROLE_CHANGED;
 			this.sleepTime = 1;
 		}catch(Exception e){
 			e.printStackTrace();
-		}		
+		}
+		
+	
 	}
 
 	/**
@@ -318,8 +329,12 @@ public class GameServer implements Role {
 	 * Método que inicia a partida
 	 */
 	public void startExecution() {
-		
-		this.gameState = new GameState();
+		String palavraCorreta ="";
+		Scanner s = new Scanner(System.in);		
+		Util.log("Entre com a palavra correta:", Configurations.OUT_INTERFACE);
+		palavraCorreta=s.nextLine();
+		this.gameState = new GameState(palavraCorreta);
+//		this.gameState = new GameState();
 		this.state = STATE_WAITING_FOR_PLAYERS;
 	}
 
@@ -354,14 +369,33 @@ public class GameServer implements Role {
 	public void addRoleListener(ArrayList<RoleListener> listener) {
 		this.myListeners.addAll(listener);
 	}
+	public void sendChangeRoleMessage(){
+		try {
+			ChangeServerMessageData csm = new ChangeServerMessageData(SystemUsersList.chooseNextServer());
+ 			Message replyMsg;
+			replyMsg = new Message(
+					this.identification,
+					MessageType.DEST_ALL,
+					MessageType.MSG_CHANGE_SERVER,
+					csm.toByteArray());
+			replyMsg.encryptMessage(privateKey);
+			MultiCastServer.getInstance().sendMessage(replyMsg);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void changeRole() {
-		 Role role = new GameServer(this.identification, this.privateKey);
-		 this.myListeners.clear();
+		 Role role = new Player(this.identification, this.privateKey);
+		 //this.myListeners.clear();
 		  for (RoleListener listener : this.myListeners) {
 			 listener.roleChanger(role);
 		  }
-		 (new Thread(role)).start();
-		role.startExecution();
+		  role.addRoleListener(this.myListeners);
+		  role.startExecution();
+		  (new Thread(role)).start();
+		 
+			
 	}
 }

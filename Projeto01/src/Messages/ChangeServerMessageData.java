@@ -22,7 +22,7 @@ public class ChangeServerMessageData {
 		String str = new String(data);
 		if(str.startsWith("Novo_Server:<")){
 			this.newServer = str.substring("Novo_Server:<".length());
-			this.valid = true;
+			this.valid = (this.newServer.equals("ERRO")? false :true);
 		}else{
 			this.newServer = "ERRO";
 			this.valid = false;

@@ -40,8 +40,7 @@ public class Main {
 
 		} else {
 			System.out.println("Welcome to Guess the Word");
-			System.out
-					.println("Params. \nIdentification Ip_Multicast Port TYPE");
+			System.out.println("Params. \nIdentification Ip_Multicast Port TYPE");
 			System.out.println("TYPE : USER or SERVER");
 		}
 	}

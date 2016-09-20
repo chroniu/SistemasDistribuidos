@@ -50,8 +50,10 @@ public class GameState {
 	/**
 	 * Construtor
 	 */
-	public GameState() {
-		this.palavaCorreta = wordGenerator();
+	public GameState(String palavraCorreta) {
+//		public GameState() {
+//		this.palavaCorreta = wordGenerator();
+		this.palavaCorreta=palavraCorreta;
 		this.letrasErradas = new ArrayList<String>();
 		this.letrasCorretas = Util.getLetterFromWord(this.palavaCorreta.toLowerCase());
 		this.playerIdentifications = new ArrayList<GamePlayerState>();

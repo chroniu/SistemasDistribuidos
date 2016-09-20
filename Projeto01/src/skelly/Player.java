@@ -5,6 +5,7 @@ import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import Messages.ChangeServerMessageData;
 import Messages.GameMessageData;
 import Messages.MessageType;
 import Messages.SimpleMessageDataChecker;
@@ -50,10 +51,14 @@ public class Player implements Role{
 	 * Método que indica o estado que o jogador vai estar
 	 */
 	public void run() {
+
+		Util.log("Inicializando Thread Player", Configurations.OUT_INTERFACE);
 		boolean continuar = true;
 		while(continuar){
 			try {
+			
 				switch (state) {
+				
 				case STATE_WAITING_GAME_START:
 					this.sleepTime = 500;
 					break;
@@ -72,12 +77,13 @@ public class Player implements Role{
 					this.sleepTime = 500;
 					break;
 				case STATE_GAME_ENDED:
-					Thread.sleep(10000);
-					//this.state = STATE_WAITING_GAME_START;
-					startExecution();
+					Thread.sleep(100);
+					this.state = STATE_WAITING_GAME_START;
+					//startExecution();
 					this.sleepTime = 1;
 					break;
-				case STATE_CHANGE_ROLE:
+				case STATE_CHANGE_ROLE:			
+					this.changeRole();
 					continuar = false;
 					break;
 				default:
@@ -91,6 +97,8 @@ public class Player implements Role{
 				e.printStackTrace();
 			}
 		}
+
+		Util.log("Finalizando Thread Player", Configurations.OUT_INTERFACE);
 	}
 
 	/**
@@ -244,7 +252,7 @@ public class Player implements Role{
 			
 		}else if (msg.type.equals(MessageType.MSG_GAME_ENDED)){
 			if(this.state == STATE_WAITING_GAME_START) return;
-			this.state  = STATE_GAME_ENDED;
+			//this.state  = STATE_GAME_ENDED;
 			
 			msg.decryptMessage(SystemUsersList.getUserPublicKey(msg.sender));
 			GameMessageData gmd = new GameMessageData(msg.data);
@@ -256,6 +264,23 @@ public class Player implements Role{
 				Util.log("Message is not valid - Wrong keys?", Configurations.OUT_LOG);
 			}
 
+		}else if(msg.type.equals(MessageType.MSG_CHANGE_SERVER)){
+			Util.log("Receibed Change Server msg", Configurations.OUT_INTERFACE);
+			
+			msg.decryptMessage(SystemUsersList.getUserPublicKey(msg.sender));
+			ChangeServerMessageData csm = new ChangeServerMessageData (msg.data);
+			Util.log("Novo Servidor: "+csm.newServer, Configurations.OUT_INTERFACE);
+			
+			if(csm.valid){
+				if(csm.newServer.equals(this.identification)){
+					this.state  = STATE_CHANGE_ROLE;
+					Util.log("Mudando Role", Configurations.OUT_INTERFACE);
+				}else{ SystemUsersList.updateServerIdentification(csm.newServer); startExecution();};
+			}else{
+				Util.log("Message is not valid - Wrong keys?", Configurations.OUT_LOG);
+			}
+				
+		}else if(msg.type.equals(MessageType.MSG_I_WANT_TO_PLAY)){
 		}else{
 			Util.log("Mensagem não reconhecida - TIPO>: "+msg.type, Configurations.OUT_INTERFACE);
 		}
@@ -298,11 +323,12 @@ public class Player implements Role{
 
 	public void changeRole() {
 		 Role role = new GameServer(this.identification, this.privateKey);
-		 this.myListeners.clear();
+//		 this.myListeners.clear();
+		 
 		  for (RoleListener listener : this.myListeners) {
 			 listener.roleChanger(role);
 		  }
+		  role.startExecution();
 		 (new Thread(role)).start();
-		 role.startExecution();
 	}
 }

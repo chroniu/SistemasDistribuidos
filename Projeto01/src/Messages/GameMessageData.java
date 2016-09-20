@@ -18,11 +18,11 @@ public class GameMessageData {
 
 	/**
 	 * Construtor 
-	 * @param messageType  string com o tipo da mensagem
+	 * @param serverMessage  string com o tipo da mensagem
 	 * @param state    GameStateDecEnconder com o estado do jogo
 	 */
-	public GameMessageData(String messageType, GameStateDecEncoder state){
-		this.serverMessage = messageType;
+	public GameMessageData(String serverMessage, GameStateDecEncoder state){
+		this.serverMessage = serverMessage;
 		this.state = state;
 	}
 	
