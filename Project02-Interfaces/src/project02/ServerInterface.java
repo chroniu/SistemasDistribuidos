@@ -7,11 +7,12 @@ import java.util.ArrayList;
 public interface ServerInterface extends Remote{
 	ArrayList<Book> getBookList() throws RemoteException;
 	
-	ServerMessage rentBook(int id, ClientInterface client) throws RemoteException;
+	ServerMessage rentBook(long bookId, ClientInterface client) throws RemoteException;
 	
-	ServerMessage rebookBook(int id, ClientInterface client) throws RemoteException;
+	ServerMessage rebookBook(long bookId, ClientInterface client) throws RemoteException;
 	
-	ServerMessage reserveBook(int id, ClientInterface client) throws RemoteException;
+	ServerMessage reserveBook(long bookId, ClientInterface client) throws RemoteException;
 
-	int giveBackBook(int id, ClientInterface client) throws RemoteException;
+	long giveBackBook(long bookId, ClientInterface client) throws RemoteException;
+
 }

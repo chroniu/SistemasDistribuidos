@@ -67,8 +67,7 @@ public class Library {
 	}
 	
 	public ArrayList<Book> getBookList(){
-		Book [] books = (Book[]) (this.bookList.entrySet().stream().filter(x -> true).toArray());
-		return (ArrayList<Book>) Arrays.asList(books);
+		return new ArrayList<Book>(this.bookList.keySet());
 	}
 	
 	/**
@@ -76,11 +75,11 @@ public class Library {
 	 */
 	private void loadBooksLibrary(){
 		this.bookList.clear();
-		
+		int id = 1;
 		try {
-			for (String line : Files.readAllLines(Paths.get("books"))) {
-				String args[] = line.split("+");
-				this.bookList.put(new Book(Integer.parseInt(args[0]), args[1]), null);
+			for (String line : Files.readAllLines(Paths.get("books.txt"))) {
+			//	String args[] = line.split("+");
+				this.bookList.put(new Book( id++, line), null);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -102,7 +101,7 @@ public class Library {
 	}
 	
 	/**
-	 * Classe assume que o livro não está reservado e o cliente não está penalizado
+	 * Classe assume que o livro nﾃ｣o estﾃ｡ reservado e o cliente nﾃ｣o estﾃ｡ penalizado
 	 * @param client
 	 * @param bookId
 	 * @return
@@ -124,9 +123,11 @@ public class Library {
 						this.clientsBooksList.add(clientHasBooks);
 						elem.setValue(clientHasBooks);
 					}
+					//TODO checar GIVE_BACK_BOOK 
+					//TODO Implementar método de renovação
 					return ServerMessage.OPERATION_SUCESSFULL;
 				}else{
-					//livro já está rented
+					//livro jﾃ｡ estﾃ｡ rented
 					return ServerMessage.ALREADY_BOOKED;
 				}
 			}catch (Exception e) {
@@ -134,6 +135,8 @@ public class Library {
 				// TODO: handle exception
 			}
 	}
-	 
-
+	
+	public long giveBackBooks(long bookId){
+		return 0;//TODO implementar
+	}
 }

@@ -5,43 +5,39 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
 public class Server extends UnicastRemoteObject implements ServerInterface{
-	private final Library library;
+	private final LibraryManager libraryManager;
 	
 	protected Server() throws RemoteException {
 		super(0);
-		this.library = new Library();
+		this.libraryManager = new LibraryManager();
 	}
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2767611403655957831L;
 
 	@Override
-	public ArrayList<Book> getBookList() {
-		return this.getBookList();
+	public ArrayList<Book> getBookList()  throws RemoteException{
+		return this.libraryManager.getBookList();
 	}
 
 	@Override
-	public ServerMessage rentBook(int id, ClientInterface client) {
-		return null;
+	public ServerMessage rentBook(long bookid, ClientInterface client)  throws RemoteException{
+		return this.libraryManager.rentBook(bookid, client);
 	}
 
 	@Override
-	public ServerMessage rebookBook(int id, ClientInterface client) {
-		// TODO Auto-generated method stub
-		return null;
+	public ServerMessage rebookBook(long bookid, ClientInterface client)  throws RemoteException{
+		return this.libraryManager.rebookBook(bookid, client);
+
 	}
 
 	@Override
-	public ServerMessage reserveBook(int id, ClientInterface client) {
-		// TODO Auto-generated method stub
-		return null;
+	public ServerMessage reserveBook(long bookid, ClientInterface client) throws RemoteException{
+		return this.libraryManager.reserveBook(bookid, client);
+
 	}
 
 	@Override
-	public int giveBackBook(int id, ClientInterface client) {
-		// TODO Auto-generated method stub
+	public long giveBackBook(long bookid, ClientInterface client) throws RemoteException{
 		return 0;
 	}
 

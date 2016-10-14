@@ -17,5 +17,10 @@ class Book implements Serializable{
 		this.title = title;
 	}
 
-	
+
+	@Override
+	public String toString() {
+		return "Book [id=" + id + ", title=" + title + "]";
+	}
+
 }
