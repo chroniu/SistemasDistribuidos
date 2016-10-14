@@ -65,4 +65,15 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 
 	}
 
+
+	public ServerMessage requestReserveBook(long bookId) {
+		try {
+			return this.server.reserveBook(bookId, this);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ServerMessage.ERROR;
+	}
+
 }

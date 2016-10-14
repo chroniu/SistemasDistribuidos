@@ -48,8 +48,26 @@ public class ClientApplication extends Application {
 		});
 		
 		Button btnDevolver = new Button("Devolver");
+		btnDevolver.setOnAction(event -> {
+            ObservableList selectedIndices = booksListView.getSelectionModel().getSelectedIndices();
+            for(Object b : selectedIndices){
+            	int selectIndex = (int)b;
+//            	ServerMessage m = Client.getIntance().requestGiveBack( booksList.get(selectIndex).id);
+//            	serverTextArea.setText(m+"");
+            }
+		});
+		
+		
 		
 		Button btnReservar = new Button("Reservar");
+		btnReservar .setOnAction(event -> {
+            ObservableList selectedIndices = booksListView.getSelectionModel().getSelectedIndices();
+            for(Object b : selectedIndices){
+            	int selectIndex = (int)b;
+            	ServerMessage m = Client.getIntance().requestReserveBook( booksList.get(selectIndex).id);
+            	serverTextArea.setText(m+"");
+            }
+		});
 		
 		
 
