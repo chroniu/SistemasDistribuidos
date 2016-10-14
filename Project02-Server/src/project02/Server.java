@@ -16,28 +16,36 @@ public class Server extends UnicastRemoteObject implements ServerInterface{
 
 	@Override
 	public ArrayList<Book> getBookList()  throws RemoteException{
+		System.out.println("Requested Books List");
 		return this.libraryManager.getBookList();
 	}
 
 	@Override
 	public ServerMessage rentBook(long bookid, ClientInterface client)  throws RemoteException{
+		System.out.println("Requested Rent Book "+bookid+" Client "+client);
 		return this.libraryManager.rentBook(bookid, client);
 	}
 
 	@Override
 	public ServerMessage rebookBook(long bookid, ClientInterface client)  throws RemoteException{
+		System.out.println("Requested Rebook Book "+bookid+" Client "+client);
+
 		return this.libraryManager.rebookBook(bookid, client);
 
 	}
 
 	@Override
 	public ServerMessage reserveBook(long bookid, ClientInterface client) throws RemoteException{
+		System.out.println("Requested Reserve Book "+bookid+" Client "+client);
+
 		return this.libraryManager.reserveBook(bookid, client);
 
 	}
 
 	@Override
 	public long giveBackBook(long bookid, ClientInterface client) throws RemoteException{
+		System.out.println("Requested Give Back Book"+bookid+" Client "+client);
+
 		return 0;
 	}
 

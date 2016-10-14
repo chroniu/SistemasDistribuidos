@@ -17,9 +17,16 @@ class ClientHasBooks{
 	
 	public ClientHasBooks( ClientInterface owner){
 		this.owner = owner;
-		this.books = new ArrayList<Long []>(3);
+		this.books = new ArrayList<Long []>();
 	}
 	
+	
+	@Override
+	public String toString() {
+		return "ClientHasBooks [owner=" + owner + ", books=" + books + ", howManyBooks()=" + howManyBooks() + "]";
+	}
+
+
 	public boolean hasBook(int id){
 		return books.stream().anyMatch(x -> x[0] == id);
 	}
@@ -110,9 +117,9 @@ public class Library {
 			try{
 				Entry<Book, ClientHasBooks> elem = this.bookList.entrySet().stream().filter(x -> x.getKey().id == bookId).findFirst().get();
 				if(elem.getValue() == null){
-					Optional<ClientHasBooks> e = this.clientsBooksList.stream().filter(x -> x.owner == client).findFirst();
+					Optional<ClientHasBooks> e = this.clientsBooksList.stream().filter(x -> x.owner.equals(client)).findFirst();
 					if( e.isPresent() ){
-						if(e.get().howManyBooks() > Config.MAX_BOOKS){
+						if(e.get().howManyBooks() >= Config.MAX_BOOKS){
 							return ServerMessage.MAX_BOOK_REACHED;
 						}
 						e.get().addBook(bookId);
