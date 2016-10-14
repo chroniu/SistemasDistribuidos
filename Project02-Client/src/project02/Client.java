@@ -5,6 +5,11 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+
 public class Client extends UnicastRemoteObject implements ClientInterface {
 	protected Client() throws RemoteException {
 		super();
@@ -47,8 +52,25 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 		}
 		return ServerMessage.ERROR;
 	}
-
-
+	
+	public ServerMessage requestReserveBook(long id){
+		try {
+			return this.server.reserveBook(id, this);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		return ServerMessage.ERROR;
+	}
+	public long requestgiveBackBook(long id){
+		try {
+			return this.server.giveBackBook(id, this);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
+	
+	
 	public boolean connectToServer() {
 		try {
 			this.server = (ServerInterface) Naming.lookup("//localhost/Server");
@@ -59,21 +81,16 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 		}
 	}
 
+//	private ClientApplication clientApplication;
+
 	@Override
 	public void notifyBookAvaliable(long bookid, long time) throws RemoteException {
-		// TODO Auto-generated method stub
-
+		JOptionPane.showMessageDialog(null, "O livro " + bookid+ "está disponível"); 
 	}
 
 
-	public ServerMessage requestReserveBook(long bookId) {
-		try {
-			return this.server.reserveBook(bookId, this);
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return ServerMessage.ERROR;
-	}
+//	public void setApplicationDialog(ClientApplication clientApplication) {
+//		this.clientApplication = clientApplication;
+//	}
 
 }

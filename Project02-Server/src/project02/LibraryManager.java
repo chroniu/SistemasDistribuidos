@@ -16,30 +16,33 @@ public class LibraryManager {
 		return this.library.getBookList();
 	}
 
-	public ServerMessage rentBook(long bookid, ClientInterface client) {
+	public synchronized ServerMessage rentBook(long bookid, ClientInterface client) {
 		final ServerMessage reserved  = this.reservedBookControl.canClientBorrowBook(client, bookid);
-		if(reserved != ServerMessage.OPERATION_SUCESSFULL)
+		if(!reserved.equals(ServerMessage.OPERATION_SUCESSFULL))
 			return reserved;
 		
 		return this.library.rentBook(client, bookid);
 	}
 
-	public ServerMessage rebookBook(long bookid, ClientInterface client) {
+	public synchronized ServerMessage rebookBook(long bookid, ClientInterface client) {
 		final ServerMessage reserved  = this.reservedBookControl.canClientBorrowBook(client, bookid);
-		if(reserved != ServerMessage.OPERATION_SUCESSFULL)
+		if(!reserved.equals(ServerMessage.OPERATION_SUCESSFULL))
 			return reserved;
 		
 		return this.library.rentBook(client, bookid);
 	}
 
-	public ServerMessage reserveBook(long bookid, ClientInterface client) {
+	public synchronized ServerMessage reserveBook(long bookid, ClientInterface client) {
 		return this.reservedBookControl.tryToReserveBook(client, bookid);
 	}
 
-	public long giveBackBook(long bookid, ClientInterface client) {
-		long penalization = this.library.giveBackBooks(bookid);
-		Optional<ClientInterface> c = this.reservedBookControl.giveBackBook(bookid);
-		 if(!c.isPresent()) return 0;
+	public synchronized  long giveBackBook(long bookid, ClientInterface client) {
+		long penalization = this.library.giveBackBooks(bookid, client);
+		if (penalization > 0){
+			this.reservedBookControl.penalizer(client, System.currentTimeMillis() );//penalization);
+		}
+		Optional<ClientInterface> c = this.reservedBookControl.giveBackBook(bookid,  client);
+		 if(!c.isPresent()) return penalization;
 		 try {
 			c.get().notifyBookAvaliable(bookid, Config.TIME_BOOK_RESERVED);
 		} catch (RemoteException e) {

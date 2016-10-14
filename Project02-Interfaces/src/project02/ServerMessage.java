@@ -7,5 +7,6 @@ public enum ServerMessage{
 	ALREADY_RESERVED, // o cliente quer renovar | emprestar  o livro, mas está reservado 
 	GIVE_BACK_BOOKS,
 	OPERATION_SUCESSFULL, 
-	BOOK_DONT_EXIST, ERROR
+	BOOK_DONT_EXIST, ERROR,
+	RENEWED_SUCESSFULLY
 }

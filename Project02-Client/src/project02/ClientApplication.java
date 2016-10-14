@@ -1,21 +1,19 @@
 package project02;
 
-import java.awt.TextArea;
 import java.util.ArrayList;
-
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class ClientApplication extends Application {
-	
+     
+   
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		primaryStage.setTitle("Cliente");
@@ -29,9 +27,11 @@ public class ClientApplication extends Application {
 
 		btnConectar.setOnAction(event -> {
 			Client.getIntance().connectToServer();
+//			Client.getIntance().setApplicationDialog(this);
 			booksListView.getItems().removeAll(booksListView.getItems());
 			booksList.removeAll(booksList);
 			booksList.addAll(Client.getIntance().requestBookList());
+			
 			booksListView.getItems().addAll(booksList);
 		});
 		
@@ -42,8 +42,13 @@ public class ClientApplication extends Application {
             ObservableList selectedIndices = booksListView.getSelectionModel().getSelectedIndices();
             for(Object b : selectedIndices){
             	int selectIndex = (int)b;
-            	ServerMessage m = Client.getIntance().requestBorrowBook( booksList.get(selectIndex).id);
+            	ServerMessage m = Client.getIntance().requestBorrowBook(((Book)booksListView.getItems().get(selectIndex)).id );
             	serverTextArea.setText(m+"");
+            	
+	            if(m.equals(ServerMessage.OPERATION_SUCESSFULL)||m.equals(ServerMessage.RENEWED_SUCESSFULLY)){
+//	            	this.tableEmprestados.
+	            }
+            	
             }
 		});
 		
@@ -52,22 +57,21 @@ public class ClientApplication extends Application {
             ObservableList selectedIndices = booksListView.getSelectionModel().getSelectedIndices();
             for(Object b : selectedIndices){
             	int selectIndex = (int)b;
-//            	ServerMessage m = Client.getIntance().requestGiveBack( booksList.get(selectIndex).id);
-//            	serverTextArea.setText(m+"");
-            }
-		});
-		
-		
-		
-		Button btnReservar = new Button("Reservar");
-		btnReservar .setOnAction(event -> {
-            ObservableList selectedIndices = booksListView.getSelectionModel().getSelectedIndices();
-            for(Object b : selectedIndices){
-            	int selectIndex = (int)b;
-            	ServerMessage m = Client.getIntance().requestReserveBook( booksList.get(selectIndex).id);
+            	long m = Client.getIntance().requestgiveBackBook(((Book)booksListView.getItems().get(selectIndex)).id );
             	serverTextArea.setText(m+"");
             }
 		});
+		
+		Button btnReservar = new Button("Reservar");
+		btnReservar.setOnAction(event -> {
+            ObservableList selectedIndices = booksListView.getSelectionModel().getSelectedIndices();
+            for(Object b : selectedIndices){
+            	int selectIndex = (int)b;
+            	ServerMessage m = Client.getIntance().requestReserveBook(((Book)booksListView.getItems().get(selectIndex)).id );
+            	serverTextArea.setText(m+"");
+            }
+		});
+		
 		
 		
 
@@ -79,6 +83,7 @@ public class ClientApplication extends Application {
 		primaryStage.show();
 
 	}
+		 
 	
 	public  static void main(String [] args){
 		Application.launch(args);

@@ -18,9 +18,16 @@ public class ReservedBookControl {
 	private final Map<Long, A> booksReserved;
 	private final Map<ClientInterface, Long> clientDeception;
 	
+	
 	public ReservedBookControl(){
 		this.booksReserved   = new HashMap<Long, A>();
 		this.clientDeception = new HashMap<ClientInterface, Long>(); 
+	}
+	
+	public void penalizer(ClientInterface client, long penalization){
+	//	long v = this.clientDeception.get(client) == null? 0 : System.currentTimeMillis() - this.clientDeception.get(client).longValue();  
+				//
+		this.clientDeception.put(client, penalization);
 	}
 	
 	private boolean isTimePassed(final long time, final long bigTime){
@@ -49,7 +56,7 @@ public class ReservedBookControl {
 		return ServerMessage.OPERATION_SUCESSFULL;
 	}
 	
-	Optional<ClientInterface> giveBackBook(long bookId){
+	Optional<ClientInterface> giveBackBook(long bookId, ClientInterface client){
 		if(!this.booksReserved.containsKey(bookId))
 			return Optional.empty();
 		
@@ -62,6 +69,8 @@ public class ReservedBookControl {
 	
 	ServerMessage canClientBorrowBook(ClientInterface cli, long bookId){
 		if(this.clientDeception.containsKey(cli)){
+			System.out.println("Client has penalization: time "+ clientDeception.get(cli) );
+			
 			if(isTimePassed(clientDeception.get(cli),Config.TIME_PENALIZATION)){
 				return ServerMessage.PENALISATION_ON;
 			} 

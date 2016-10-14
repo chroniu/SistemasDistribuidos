@@ -5,10 +5,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+
+import javax.swing.text.html.MinimalHTMLWriter;
 
 
 class ClientHasBooks{
@@ -17,16 +21,9 @@ class ClientHasBooks{
 	
 	public ClientHasBooks( ClientInterface owner){
 		this.owner = owner;
-		this.books = new ArrayList<Long []>();
+		this.books = new ArrayList<Long []>(3);
 	}
 	
-	
-	@Override
-	public String toString() {
-		return "ClientHasBooks [owner=" + owner + ", books=" + books + ", howManyBooks()=" + howManyBooks() + "]";
-	}
-
-
 	public boolean hasBook(int id){
 		return books.stream().anyMatch(x -> x[0] == id);
 	}
@@ -43,15 +40,24 @@ class ClientHasBooks{
 		Long [] b = new Long[2]; 
 		b[0] = id;
 		b[1] = System.currentTimeMillis();
-		books.add(b);
+		this.books.add(b);
 	}
-	
+	public boolean isGiveBackTimeOver(){
+		for (Long [] book : this.books){
+			if (isTimePassed(book[1], Config.TIME_EMPRESTADO))
+				return true;
+		}
+		return false;
+	}
+	private boolean isTimePassed(final long time, final long bigTime){
+		return System.currentTimeMillis() - time > bigTime;
+	}
 	/**
 	 * Removes the book from the client and return the time that the book was rented;
 	 * @param id
 	 * @return
 	 */
-	public long removeBook(int id){
+	public long removeBook(long id){
 		Long [] elem = this.books.stream().filter(x -> x[0] == id).findFirst().get();
 		books.remove(elem);
 		return elem[1];
@@ -74,7 +80,9 @@ public class Library {
 	}
 	
 	public ArrayList<Book> getBookList(){
-		return new ArrayList<Book>(this.bookList.keySet());
+		return  (new ArrayList<Book>(this.bookList.keySet()));
+//		Book [] books = (Book[]) //(this.bookList.entrySet().stream().filter(x -> true).toArray());
+//		return (ArrayList<Book>) Arrays.asList(books);
 	}
 	
 	/**
@@ -82,10 +90,11 @@ public class Library {
 	 */
 	private void loadBooksLibrary(){
 		this.bookList.clear();
-		int id = 1;
+		int id=1;
 		try {
 			for (String line : Files.readAllLines(Paths.get("books.txt"))) {
-			//	String args[] = line.split("+");
+//				String args[] = line.split("+");
+//				this.bookList.put(new Book(Integer.parseInt(args[0]), args[1]), null);
 				this.bookList.put(new Book( id++, line), null);
 			}
 		} catch (IOException e) {
@@ -107,8 +116,10 @@ public class Library {
 		}
 	}
 	
+	
+	
 	/**
-	 * Classe assume que o livro nﾃ｣o estﾃ｡ reservado e o cliente nﾃ｣o estﾃ｡ penalizado
+	 * Classe assume que o livro não está reservado e o cliente não está penalizado
 	 * @param client
 	 * @param bookId
 	 * @return
@@ -118,9 +129,12 @@ public class Library {
 				Entry<Book, ClientHasBooks> elem = this.bookList.entrySet().stream().filter(x -> x.getKey().id == bookId).findFirst().get();
 				if(elem.getValue() == null){
 					Optional<ClientHasBooks> e = this.clientsBooksList.stream().filter(x -> x.owner.equals(client)).findFirst();
-					if( e.isPresent() ){
-						if(e.get().howManyBooks() >= Config.MAX_BOOKS){
+					    if( e.isPresent() ){
+					    if(e.get().howManyBooks() > Config.MAX_BOOKS){
 							return ServerMessage.MAX_BOOK_REACHED;
+						}
+						if(e.get().isGiveBackTimeOver()){
+							return ServerMessage.GIVE_BACK_BOOKS;
 						}
 						e.get().addBook(bookId);
 						elem.setValue(e.get());
@@ -130,20 +144,72 @@ public class Library {
 						this.clientsBooksList.add(clientHasBooks);
 						elem.setValue(clientHasBooks);
 					}
-					//TODO checar GIVE_BACK_BOOK 
-					//TODO Implementar método de renovação
-					return ServerMessage.OPERATION_SUCESSFULL;
-				}else{
-					//livro jﾃ｡ estﾃ｡ rented
+					//TODO Implementar metodo de renovacao
+
+					   return ServerMessage.OPERATION_SUCESSFULL;
+				}else if(elem.getValue().owner.equals(client)){
+					//AQUI ELE RENOVA
+					Optional<ClientHasBooks> e = this.clientsBooksList.stream().filter(x -> x.owner.equals(client)).findFirst();					
+					if(e.get().isGiveBackTimeOver()){
+						return ServerMessage.GIVE_BACK_BOOKS;
+					}
+					//elem.getValue()
+					e.get().removeBook(bookId);
+					//ClientHasBooks clientHasBooks = new ClientHasBooks(client);
+					//clientHasBooks.addBook(bookId);
+					//this.clientsBooksList.add(clientHasBooks);
+					//elem.setValue(clientHasBooks);
+					e.get().addBook(bookId);
+					return ServerMessage.RENEWED_SUCESSFULLY;
+				}				
+				else{
+					//livro já está rented
 					return ServerMessage.ALREADY_BOOKED;
 				}
 			}catch (Exception e) {
+				e.printStackTrace();
 				return ServerMessage.BOOK_DONT_EXIST;
-				// TODO: handle exception
+	
 			}
 	}
 	
-	public long giveBackBooks(long bookId){
-		return 0;//TODO implementar
+	public long giveBackBooks(long bookId, ClientInterface client){
+		long penalty=0;
+		Entry<Book, ClientHasBooks> elem = this.bookList.entrySet().stream().filter(x -> x.getKey().id == bookId).findFirst().get();
+		if(elem.getValue() == null){
+			System.out.println("Nao esta emprestado");
+			return 0;
+			//Nao esta emprestado
+		}
+		else{
+			if(!elem.getValue().owner.equals(client)){
+				return 0;
+			}
+			
+			long e=0;
+			System.out.println("Tentando receber...");
+			for(int i = 0; i < elem.getValue().books.size(); i++){
+			       if(  elem.getValue().books.get(i)[0] == bookId){
+			               e = elem.getValue().books.get(i)[1];
+			   			System.out.println("Livro Achado...");
+						
+			               if(System.currentTimeMillis() - e > Config.TIME_EMPRESTADO){
+	       		
+			            	   penalty=((System.currentTimeMillis()-e)/Config.TIME_EMPRESTADO)*Config.TIME_PENALIZATION;
+				       			System.out.println("Penalidade: "+penalty);			
+				       			
+			               }
+			               else{
+			            	   System.out.println("Sem penalidade");
+			               }
+			       }
+			}
+			Optional<ClientHasBooks> aux = this.clientsBooksList.stream().filter(x -> x.books.equals(elem.getValue().books)).findFirst();
+			//elem.getValue()
+			aux.get().removeBook(bookId);
+			elem.setValue(null);
+		}
+		return penalty;
+	
 	}
 }

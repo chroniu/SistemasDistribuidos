@@ -11,6 +11,12 @@ public class Main {
 		ServerInterface obj = (ServerInterface) Naming.lookup("//localhost/Server");
 
 		List<Book> strList = obj.getBookList();
+		System.out.println(obj.rentBook(1, Client.getIntance()));
 		System.out.println(obj.rentBook(2, Client.getIntance()));
+		System.out.println(obj.rentBook(3, Client.getIntance()));
+		System.out.println("Rent Max: " + obj.rentBook(4, Client.getIntance()));
+		System.out.println("Give Back: " + obj.giveBackBook(1, Client.getIntance()));
+		System.out.println("Rent 1: "+obj.rentBook(1, Client.getIntance()));
+		
 	}
 }
