@@ -6,6 +6,9 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
 
+/**
+Classe para testes de comunicação. Não é utilizada pela interface gráfica
+*/
 public class Main {
 	public static void main(String args[]) throws MalformedURLException, RemoteException, NotBoundException {
 		ServerInterface obj = (ServerInterface) Naming.lookup("//localhost/Server");

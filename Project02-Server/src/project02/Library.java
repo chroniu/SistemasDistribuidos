@@ -12,12 +12,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-import javax.swing.text.html.MinimalHTMLWriter;
-
-
+/**
+Classe auxiliar para armazenar os livros que cada cliente possui atualmente
+*/
 class ClientHasBooks{
-	final ClientInterface owner;
+	/**
+	O cliente
+	*/
+	final ClientInterface owner; 
+	/*
+	Os livros que o @owner possui emprestados e o timestamp de quando emprestou  
+	[0] -> bookId
+	[1] -> timestamp
+	*/
 	final ArrayList<Long []> books;
+	
 	
 	public ClientHasBooks( ClientInterface owner){
 		this.owner = owner;
@@ -33,7 +42,7 @@ class ClientHasBooks{
 	}
 	
 	/**
-	 * The client rent the book with the id
+	 * The client rented the book with the id
 	 * @param id
 	 */
 	public void addBook(long id){
@@ -42,6 +51,8 @@ class ClientHasBooks{
 		b[1] = System.currentTimeMillis();
 		this.books.add(b);
 	}
+	
+	
 	public boolean isGiveBackTimeOver(){
 		for (Long [] book : this.books){
 			if (isTimePassed(book[1], Config.TIME_EMPRESTADO))
@@ -49,6 +60,8 @@ class ClientHasBooks{
 		}
 		return false;
 	}
+	
+	
 	private boolean isTimePassed(final long time, final long bigTime){
 		return System.currentTimeMillis() - time > bigTime;
 	}
@@ -65,6 +78,9 @@ class ClientHasBooks{
 }
 
 
+/**
+Classe que armazena os livros, os livros emprestados por cada cliente  e possui métodos para a manipulação dos dados
+*/
 public class Library {
 	
 	
@@ -78,7 +94,9 @@ public class Library {
 		loadBooksLibrary();
 		
 	}
-	
+	/*
+	Retorna a lista de livros
+	*/
 	public ArrayList<Book> getBookList(){
 		return  (new ArrayList<Book>(this.bookList.keySet()));
 //		Book [] books = (Book[]) //(this.bookList.entrySet().stream().filter(x -> true).toArray());
@@ -86,7 +104,7 @@ public class Library {
 	}
 	
 	/**
-	 * Load books from File
+	 * Load books from File "books.txt"
 	 */
 	private void loadBooksLibrary(){
 		this.bookList.clear();
@@ -103,10 +121,18 @@ public class Library {
 		
 	}
 	
+	/**
+	Adiciona o livro @book à biblioteca
+	@param book o livro a ser adicionado
+	*/
 	public void addBook(Book book){
 		this.bookList.put(book, null);
 	}
 	
+	/**
+	Verifica se o livro @bookId pode ser emprestado
+	@param bookId -> id do livro para pesquisa
+	*/
 	public boolean isBookAvaliable(int bookId){
 		try{
 			return this.bookList.entrySet().stream().filter(x -> x.getKey().id == bookId).findFirst().get().getValue() == null;
@@ -119,10 +145,10 @@ public class Library {
 	
 	
 	/**
-	 * Classe assume que o livro não está reservado e o cliente não está penalizado
+	 * Classe assume que o livro @bookId não está reservado e que o cliente @client não possui penalizações
 	 * @param client
 	 * @param bookId
-	 * @return
+	 * return retorna o status da operação
 	 */
 	public ServerMessage rentBook(ClientInterface client, long bookId){
 			try{
@@ -173,6 +199,10 @@ public class Library {
 			}
 	}
 	
+	/**
+	Realiza a devolução do livro @bookId à biblioteca
+	return o timestamp do empréstimo do livro 
+	*/
 	public long giveBackBooks(long bookId, ClientInterface client){
 		long penalty=0;
 		Entry<Book, ClientHasBooks> elem = this.bookList.entrySet().stream().filter(x -> x.getKey().id == bookId).findFirst().get();

@@ -11,6 +11,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+/**
+Implementa a interface gráfica
+*/
 public class ClientApplication extends Application {
      
    
@@ -43,6 +46,7 @@ public class ClientApplication extends Application {
             for(Object b : selectedIndices){
             	int selectIndex = (int)b;
             	ServerMessage m = Client.getIntance().requestBorrowBook(((Book)booksListView.getItems().get(selectIndex)).id );
+//            	((Book)booksListView.getItems().get	(selectIndex)).setBackGroundColor(Color.RED);
             	serverTextArea.setText(m+"");
             	
 	            if(m.equals(ServerMessage.OPERATION_SUCESSFULL)||m.equals(ServerMessage.RENEWED_SUCESSFULLY)){

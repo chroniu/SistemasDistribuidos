@@ -4,7 +4,12 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-public class Server extends UnicastRemoteObject implements ServerInterface{
+
+
+/*
+Implementa a interface do servidor
+*/
+public  class Server extends UnicastRemoteObject implements ServerInterface {
 	private final LibraryManager libraryManager;
 	
 	protected Server() throws RemoteException {

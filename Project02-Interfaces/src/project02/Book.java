@@ -1,8 +1,11 @@
 package project02;
-
 import java.io.Serializable;
 
-class Book implements Serializable{
+
+/**
+A classe representa um livro
+*/
+class Book  implements Serializable {
 	/**
 	 * 
 	 */
@@ -10,7 +13,11 @@ class Book implements Serializable{
 	final long id;
 	final String title;
 	
-	
+	/**
+	Construtor
+	@param id : id do livro
+	@param title : titulo do livro
+	*/
 	public Book(long id, String title) {
 		super();
 		this.id = id;
@@ -18,10 +25,9 @@ class Book implements Serializable{
 	}
 
 
-	@Override
 	public String toString() {
 		return this.title;
 //		return "Book [id=" + id + ", title=" + title + "]";
 	}
-
+	 
 }
